@@ -1,0 +1,39 @@
+{
+  "name": "mosaic",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A focused desktop writing desk for native HTML documents.",
+  "type": "module",
+  "main": "dist-electron/main.cjs",
+  "packageManager": "pnpm@10.29.3",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "run-s build:electron && run-p dev:renderer dev:electron",
+    "dev:renderer": "vite",
+    "dev:electron": "wait-on http://127.0.0.1:5173 && node scripts/run-electron.mjs --dev",
+    "start": "node scripts/run-electron.mjs",
+    "build": "run-s build:electron build:renderer",
+    "build:electron": "node scripts/build-electron.mjs",
+    "build:renderer": "vite build",
+    "typecheck": "tsc --noEmit",
+    "check": "run-s typecheck build"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "electron": "^44.4.5",
+    "esbuild": "^0.27.3",
+    "npm-run-all2": "^9.0.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "wait-on": "^9.0.3"
+  }
+}

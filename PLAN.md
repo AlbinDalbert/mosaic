@@ -1,7 +1,8 @@
 # Mosaic implementation plan
 
 Created: 2026-09-26.
-Status: planning. No implementation or performance acceptance is claimed.
+Status: product direction. Implementation reset to a bare scaffold on 2026-10-01.
+No document behavior or performance acceptance is claimed.
 
 ## 1. Read this first
 
@@ -18,16 +19,23 @@ This is not an abandonment of structured projects, a Neo clone, or a cosmetic
 refresh of Amanite. Neo is a reference for product scope, writing interactions,
 and how little an ordinary editing operation needs to involve.
 
-This document defines Mosaic's direction. The sibling repositories are sources
-of code and evidence, not additional implementation requirements. Amanite's
+This document defines Mosaic's direction. Implementation proceeds in small
+changes that the user can understand and review. The earlier prototype has been
+archived and removed; it is not the starting point for feature development.
+Proof-of-concept features, mocks, placeholder services, and speculative
+abstractions are not part of this approach.
+
+The sibling repositories are sources of code and evidence, not additional
+implementation requirements. Amanite's
 `docs/document-runtime-replacement-plan.md` describes useful findings but is not
 Mosaic's roadmap. Do not complete that migration as a prerequisite for Mosaic.
 
 ### Instructions for implementation agents
 
-1. Read this document before implementing a milestone.
+1. Read this document and the repository AGENTS.md before implementing behavior.
 2. Distinguish settled decisions, proposed designs, and unresolved questions.
-3. Implement the smallest complete milestone and verify its stated behavior.
+3. Implement the requested behavior in a small, complete change and verify it.
+   This plan does not authorize implementing features ahead of the user's work.
 4. Keep correctness requirements when simplifying code. Do not silently remove
    recovery or overwrite protection to achieve a performance target.
 5. Do not recreate old synchronization layers under new names.
@@ -46,6 +54,8 @@ These decisions come from the user and are not open technology-selection tasks.
 | --- | --- |
 | Product name | Mosaic |
 | Desktop stack | Electron, TypeScript, React |
+| Package manager | pnpm; Electron retains its bundled Node.js and Chromium runtimes |
+| Initial appearance | Dark native theme and renderer, with a custom title bar and window controls |
 | Initial language scope | No Rust or Tauri dependency; justify any future native component separately |
 | Product priority | Desktop writing first; headless support is secondary |
 | Headless authority | Same editing rules and authority as the desktop, not a separate disk-editing engine |
@@ -107,7 +117,7 @@ off the typing path regardless of language.
 - Secondary headless operation with the same document rules.
 
 Keeping a capability does not require keeping its current UI or implementation.
-The initial milestones need not implement all capabilities simultaneously.
+The initial changes need not implement all capabilities simultaneously.
 
 ### Remove as requirements
 
@@ -122,7 +132,7 @@ The initial milestones need not implement all capabilities simultaneously.
 - Old-format compatibility and automatic conversion of existing projects.
 - Preserving the current Amanite workspace arrangement.
 
-### Reconsider through product experiments
+### Review when designing interactions
 
 Existing editor groups, tabs, reference inspectors, and health panels must earn
 their place in the new workflow. Preserve useful tasks, not control layouts.
@@ -155,13 +165,13 @@ or recovery purposes, but must not become a second live editing authority.
 
 ### Initial editor candidate
 
-Lexical is the initial candidate, not a user-mandated permanent choice. Prove it
-with a small desktop experiment before porting the full editor integration.
+Lexical is the initial candidate, not a user-mandated permanent choice. Review
+the editor integration when implementing actual editing behavior.
 Reuse useful nodes and commands without copying old ownership machinery.
 
 Lexical supports headless state operations through `@lexical/headless`. HTML
 import/export may need DOM facilities or an appropriate conversion environment.
-Prove conversion with the actual nodes and format; do not assume headless state
+Verify conversion with the actual nodes and format; do not assume headless state
 support makes every browser-dependent plugin usable in Node.
 
 Do not build a source-text editor with hidden HTML markup as an assumed Neo
@@ -192,7 +202,7 @@ CRDT, or command-sourcing platform to implement it.
 
 ### Electron responsibilities
 
-Proposed starting allocation, to verify in the first experiment:
+Proposed allocation, to review as each responsibility is implemented:
 
 | Area | Responsibility |
 | --- | --- |
@@ -222,9 +232,9 @@ silently gain permission to bypass validation, conflict handling, or recovery.
 - Reading disk does not expose unsaved desktop edits. A command targeting a live
   document must query or operate on its owning session.
 
-Build only enough early headless support to prove shared semantics. Do not make
-a daemon, public protocol, or CLI compatibility promise a prerequisite for the
-desktop product.
+Implement headless support when its scope is agreed, using the same semantics.
+Do not make a daemon, public protocol, or CLI compatibility promise a
+prerequisite for the desktop product.
 
 ## 6. Persistence and external changes
 
@@ -340,79 +350,29 @@ and preserve required notices when copying code from any source.
 Keep sibling repositories unchanged during Mosaic implementation unless the
 user specifically asks for changes there.
 
-## 10. Milestones and exit criteria
+## 10. Delivery approach
 
-### M0: Record the product and format contract
+The repository starts with an empty desktop application. The previous sequence
+of proof-of-concept milestones has been retired. The next behavior is chosen
+with the user, and each change should be understandable before work expands.
 
-- Create the new-version format specification and representative fixtures.
-- Record the initial external-change, title-commit, and unsupported-content policies.
-- Record intended writing tasks and a minimal UI flow for testing them.
-- Identify reusable code without copying entire subsystems.
+For each agreed behavior:
 
-Exit: remaining questions are explicit; no accidental compatibility or CLI-first
-requirements remain. Desktop implementation can start without guessing format
-ownership.
+1. State what the user should be able to do and how to verify it.
+2. Review the relevant product decisions and explain where the state belongs.
+3. Implement the behavior without temporary mocks or speculative interfaces.
+4. Verify the behavior and explain the changed code together.
+5. Record the result and any concrete unresolved issue.
 
-### M1: Prove the editor and document owner
+The intended work still includes document format and editing, persistence and
+recovery, structured projects and links, the writing workflow, headless
+commands, and release packaging. These are areas of work, not permission to
+implement several systems at once.
 
-- Scaffold Electron, TypeScript, React, and a minimal real desktop editor.
-- Start with Lexical; import one native document and capture it for export.
-- Implement stable document sessions and focus-existing duplicate opening.
-- Retain selection/history across navigation. Keep React out of keystroke-wide
-  workspace updates.
-- Measure ordinary and large-document typing before adding background features.
-
-Exit: real desktop evidence of responsive typing, correct round-trip content,
-one editor per document, and stable selection/history. Record engine limitations
-instead of attributing all failures to application code.
-
-### M2: Prove saving, recovery, and external-change behavior
-
-- Add one document-save path, bounded scheduling, and revision acknowledgements.
-- Implement recovery, save failures, close barriers, and explicit external-change
-  resolution.
-- Instrument encoding and IPC costs; compare against M1.
-
-Exit: sustained typing through saves retains exact text, caret, and undo; slow
-or failing storage does not interrupt editing; crash recovery restores the latest
-confirmed recovery revision. No ordinary save imports content into the editor.
-
-### M3: Prove structure and shared commands
-
-- Implement the folder tree/order and title-driven rename/move behavior.
-- Maintain explicit links across changes, including dirty open documents.
-- Implement one headless editing path using the shared rules and enforce
-  exclusive project ownership or routing to the current owner.
-- Define structural undo and multi-file recovery behavior.
-
-Exit: rename a linked document while another affected document has unsaved
-edits, then save/reopen without loss or stale references. A headless command
-produces equivalent semantic results and cannot bypass desktop ownership.
-
-### M4: Design and build the writing workflow
-
-- Test writing, navigating a collection, and consulting references with real
-  material. Use Neo as a concrete reference for interaction quality.
-- Build the intentional UI around the proven core.
-- Add search, derived links, exports, AI, and selected writing tools in bounded
-  increments. Recheck responsiveness when a feature adds recurring work.
-- Decide which existing Amanite workspace capabilities belong in Mosaic.
-
-Exit: agreed tasks are comfortable in actual use, not only attractive in an
-empty screenshot. Features neither bypass commands nor introduce a second live
-document representation.
-
-### M5: Release hardening
-
-- Package and test target desktop platforms.
-- Exercise process termination, failed writes, interrupted structural changes,
-  recovery, repeated open/close, and real composition input.
-- Review format validation, preload permissions, imported HTML handling, and
-  lifecycle cleanup.
-- Document headless limitations and the external-editing contract.
-
-Exit: publish actual test coverage and limitations. Do not claim tested power-loss
-durability or cross-platform behavior without evidence.
+Performance and correctness evidence belongs to the actual behavior as it is
+built. Ordinary saves must preserve newer edits; structural changes must
+preserve unsaved content and links; supported editing must keep selection and
+history stable. An empty scaffold claims none of these capabilities.
 
 ## 11. Required evidence
 
@@ -459,10 +419,10 @@ with tests that merely repeat implementation details.
 
 ## 12. Open decisions
 
-Resolve these at the relevant milestone; do not reopen the settled stack.
+Resolve these when implementing the relevant behavior; retain the settled stack.
 
 - Exact new-version format and supported markup.
-- Lexical acceptance after the initial desktop experiment.
+- Editor choice and integration when actual editing behavior is implemented.
 - Title-commit interaction and structural undo behavior.
 - External-change resolution details and baseline granularity.
 - Autosave/recovery deadlines and durability guarantees.
@@ -473,9 +433,12 @@ Resolve these at the relevant milestone; do not reopen the settled stack.
 
 ## 13. Progress record
 
-| Date | Milestone | Work and evidence | Remaining work |
+| Date | Stage | Work and evidence | Remaining work |
 | --- | --- | --- | --- |
-| 2026-09-26 | Planning | Recorded discussion decisions and proposed architecture; no application code copied | M0 contract and fixtures; M1 desktop experiment |
+| 2026-09-26 | Discarded prototype | A standalone HTML format and Electron + React + Lexical editor were created. They were not accepted as the foundation for Mosaic and were archived and removed on 2026-10-01. | Product and format decisions remain to be implemented through reviewed changes |
+| 2026-10-01 | Scaffold reset | Retained Electron, TypeScript, React, and build/run tooling. Removed document code, editor dependencies, UI styling, preload/IPC, the provisional format contract, and demo fixture. `npm run check` and dependency-tree validation pass. Electron launches with both the built HTML and Vite renderer were checked on Linux in a virtual display: one window, empty mounted React root, context isolation and sandboxing enabled, no renderer Node access. | Choose the next small behavior with the user |
+| 2026-10-01 | Window appearance and package manager | Added a dark native theme, dark initial window/renderer backgrounds, and a custom draggable title bar with minimize, maximize/restore, and close commands through a narrow preload bridge. Removed the native frame and default application menu. Migrated to pnpm 10.29.3; all 162 locked package versions match the previous npm lockfile. Frozen installation and `pnpm check` pass. Built and development Electron window controls, dark color scheme, drag-region CSS, and renderer isolation were checked on Linux/Wayland. | Add actual application behavior in a small reviewed change; other desktop platforms remain untested |
+| 2026-10-01 | Default amber palette | Applied Amanite's default Ember colors from `src/styles/tokens.css` at commit `480c4a47fea0d49fefcb1147d970eb4f44e2cf6d` to the existing shell and matching Electron startup background. `pnpm check` passes; background, text, title bar, border, amber accent, and hover colors were verified in Electron on Linux/Wayland. | Continue with the next user-selected change |
 
 ## 14. Reference material
 

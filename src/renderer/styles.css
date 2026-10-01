@@ -1,0 +1,77 @@
+:root {
+  /* Amanite's default Ember palette. */
+  --app-background: #0c0b09;
+  --app-panel: #15130f;
+  --app-text: #e6dfd4;
+  --app-text-strong: #fbf7ef;
+  --app-border: #302b23;
+  --app-accent: #dfa13d;
+  --app-accent-strong: #f2c96f;
+  --app-accent-soft: rgba(223, 161, 61, 0.12);
+  --app-danger: #b33a2e;
+
+  color-scheme: dark;
+  background: var(--app-background);
+  color: var(--app-text);
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+.title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  background: var(--app-panel);
+  border-bottom: 1px solid var(--app-border);
+  app-region: drag;
+  user-select: none;
+}
+
+.window-title {
+  margin-left: 12px;
+  font-size: 12px;
+  color: var(--app-accent);
+}
+
+.window-controls {
+  display: flex;
+  height: 100%;
+  app-region: no-drag;
+}
+
+.window-controls button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.window-controls button:hover {
+  background: var(--app-accent-soft);
+  color: var(--app-accent-strong);
+}
+
+.window-controls button:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: -3px;
+}
+
+.window-controls .close-window:hover {
+  background: var(--app-danger);
+  color: var(--app-text-strong);
+}
+
+.window-controls svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+}
