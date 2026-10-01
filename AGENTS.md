@@ -1,6 +1,7 @@
 # Working on Mosaic
 
-Read PLAN.md for product direction and README.md for the current code layout.
+Read CONTEXT.md for product ethos and priorities, PLAN.md for implementation
+direction, and README.md for the current code layout.
 The repository starts with a bare Electron, TypeScript, and React scaffold.
 
 The user is rebuilding their understanding of the code while developing this

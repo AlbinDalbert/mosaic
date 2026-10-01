@@ -6,6 +6,11 @@ No document behavior or performance acceptance is claimed.
 
 ## 1. Read this first
 
+Read [CONTEXT.md](CONTEXT.md) for Mosaic's product ethos and priority hierarchy.
+It governs tradeoffs between the capabilities described here. Keeping a
+capability in scope does not give it equal priority or authorize it to disrupt
+a higher priority capability.
+
 Mosaic is a new desktop writing application that combines the useful parts of
 Amanite and Fractal. It starts in a new repository so their existing boundaries
 do not dictate its architecture. Reuse substantial code where it fits; do not
