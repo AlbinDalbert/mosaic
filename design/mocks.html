@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<title>Mosaic — UI language mocks</title>
+<style>
+  /* ------------------------------------------------------------------
+     Tokens. Colors are the existing Ember palette from styles.css.
+     Everything below the tokens is mock-only presentation.
+     ------------------------------------------------------------------ */
+  :root {
+    --bg: #0c0b09;
+    --panel: #15130f;
+    --text: #e6dfd4;
+    --text-strong: #fbf7ef;
+    --text-dim: #8f8678;
+    --border: #302b23;
+    --accent: #dfa13d;
+    --accent-strong: #f2c96f;
+    --accent-soft: rgba(223, 161, 61, 0.12);
+    --danger: #b33a2e;
+
+    --prose: var(--text);
+    --font-ui: "JetBrains Mono", "Liberation Mono", ui-monospace, monospace;
+    --font-prose: "Iowan Old Style", Charter, "Bitstream Charter", "Liberation Serif", Georgia, serif;
+  }
+  body[data-prose="sans"] { --font-prose: "Inter", "Liberation Sans", system-ui, sans-serif; }
+  body[data-prose="mono"] { --font-prose: var(--font-ui); }
+  body[data-ink="amber"] { --prose: #e9b765; }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #070605;
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* ---------- Page chrome (not part of Mosaic) ---------- */
+  .page { max-width: 1340px; margin: 0 auto; padding: 40px 32px 96px; }
+  .page > header h1 {
+    margin: 0 0 6px; font-size: 15px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .page > header p { margin: 0; max-width: 78ch; color: var(--text-dim); }
+  .switches { display: flex; gap: 28px; flex-wrap: wrap; margin: 20px 0 8px; }
+  .switches fieldset { border: 1px solid var(--border); padding: 6px 12px 8px; margin: 0; }
+  .switches legend { padding: 0 6px; color: var(--text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; }
+  .switches label { margin-right: 14px; cursor: pointer; }
+  .switches input { accent-color: var(--accent); }
+
+  section.mock {
+    display: grid; grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 28px; margin-top: 56px; align-items: start;
+  }
+  section.mock > h2 {
+    grid-column: 1 / -1; margin: 0; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);
+    border-bottom: 1px solid var(--border); padding-bottom: 8px;
+  }
+  section.mock > h2 span { color: var(--text-dim); }
+  aside.notes { color: var(--text-dim); font-size: 12px; }
+  aside.notes h3 { margin: 0 0 4px; font-size: 11px; color: var(--text); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; }
+  aside.notes p, aside.notes ul { margin: 0 0 14px; }
+  aside.notes ul { padding-left: 16px; }
+  aside.notes b { color: var(--text); font-weight: 500; }
+  aside.notes .open { color: var(--accent); }
+  @media (max-width: 1100px) { section.mock { grid-template-columns: 1fr; } }
+
+  /* ---------- The app frame ---------- */
+  .app {
+    display: grid; grid-template-rows: 36px minmax(0, 1fr) 26px;
+    height: 600px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); overflow: hidden; position: relative;
+  }
+  .app.short { height: 420px; }
+
+  .titlebar {
+    display: flex; align-items: center; gap: 10px; padding-left: 12px;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+    font-size: 12px; user-select: none;
+  }
+  .titlebar .mark { width: 14px; height: 14px; display: block; }
+  .titlebar .mark rect { fill: var(--accent); }
+  .titlebar .mark rect.off { fill: var(--border); }
+  .titlebar .name { color: var(--accent); font-weight: 700; letter-spacing: 0.14em; }
+  .titlebar .doc { color: var(--text-dim); }
+  .titlebar .controls { margin-left: auto; display: flex; height: 100%; }
+  .titlebar .controls span { width: 44px; display: grid; place-items: center; color: var(--text-dim); }
+  .titlebar svg.ctl { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.25; }
+
+  .body { display: grid; grid-template-columns: 224px minmax(0, 1fr); min-height: 0; }
+  .app.focus .body { grid-template-columns: minmax(0, 1fr); }
+  .app.focus .tree { display: none; }
+
+  /* File tree */
+  .tree {
+    background: var(--panel); border-right: 1px solid var(--border);
+    padding: 14px 0; font-size: 12.5px; overflow: hidden;
+  }
+  .tree .project {
+    padding: 0 14px 10px; font-size: 11px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .tree ul { list-style: none; margin: 0; padding: 0; }
+  .tree ul ul { margin-left: 19px; border-left: 1px solid var(--border); }
+  .tree li > div { padding: 2px 14px 2px 14px; white-space: nowrap; }
+  .tree ul ul li > div { padding-left: 10px; }
+  .tree .fold { display: inline-block; width: 12px; color: var(--text-dim); }
+  .tree .folder > div { color: var(--text-dim); }
+  .tree .current > div { background: var(--accent); color: var(--bg); font-weight: 700; }
+  .tree .unsaved > div::after { content: " *"; }
+
+  /* Editor */
+  .editor { position: relative; overflow: hidden; }
+  .column {
+    max-width: 66ch; margin: 0 auto; padding: 48px 40px 0;
+    font-family: var(--font-prose); color: var(--prose);
+    font-size: 17px; line-height: 1.65;
+  }
+  body[data-prose="mono"] .column { font-size: 15px; max-width: 72ch; }
+
+  .column h1, .column h2, .column h3 { color: var(--text-strong); line-height: 1.25; margin: 0; position: relative; }
+  .column h1 { font-size: 1.9em; font-weight: 700; margin-bottom: 0.7em; }
+  .column h2 { font-size: 1.35em; font-weight: 700; margin: 1.5em 0 0.5em; }
+  .column h3 { font-size: 1.05em; font-weight: 700; margin: 1.3em 0 0.3em; letter-spacing: 0.02em; }
+  .column p { margin: 0 0 0.9em; position: relative; }
+  .column strong { font-weight: 700; color: var(--text-strong); }
+  .column em { font-style: italic; }
+
+  /* Implicit link: underline is the non-color cue. */
+  .ilink {
+    text-decoration: underline dotted;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+  }
+  .ilink.hover {
+    text-decoration-style: solid; color: var(--accent-strong);
+  }
+
+  /* Block-type gutter for the block holding the caret. */
+  .here::before {
+    content: attr(data-kind);
+    position: absolute; left: -44px; top: 0.35em; width: 30px; text-align: right;
+    font-family: var(--font-ui); font-size: 10px; font-weight: 400; letter-spacing: 0.06em;
+    color: var(--accent); opacity: 0.75;
+  }
+  .caret {
+    display: inline-block; width: 2px; height: 1.15em; margin: 0 -1px;
+    vertical-align: -0.2em; background: var(--accent-strong);
+  }
+  .sel { background: var(--accent-soft); box-shadow: 0 0 0 1px rgba(223,161,61,0.25); }
+
+  /* Status line */
+  .status {
+    display: flex; align-items: center; gap: 22px; padding: 0 12px;
+    background: var(--panel); border-top: 1px solid var(--border);
+    font-size: 11.5px; color: var(--text-dim); white-space: nowrap;
+  }
+  .status .path { overflow: hidden; text-overflow: ellipsis; }
+  .status .right { margin-left: auto; display: flex; gap: 22px; align-items: center; }
+  .status .save { color: var(--text); }
+  .status.failed { background: var(--accent); color: var(--bg); border-top-color: var(--accent); }
+  .status.failed .save { color: var(--bg); font-weight: 700; }
+
+  /* Bracket buttons */
+  .btn {
+    font: inherit; font-size: 12px; color: var(--text); background: transparent;
+    border: 1px solid var(--border); padding: 3px 10px; cursor: pointer; white-space: nowrap;
+  }
+  .btn::before { content: "[ "; color: var(--text-dim); }
+  .btn::after { content: " ]"; color: var(--text-dim); }
+  .btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .btn.primary { border-color: var(--accent); color: var(--accent-strong); }
+  .btn.focus { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+  .status.failed .btn { color: var(--bg); border-color: var(--bg); padding: 0 8px; font-size: 11px; font-weight: 700; }
+  .status.failed .btn::before, .status.failed .btn::after { color: var(--bg); }
+
+  /* Notice inside the editor column */
+  .notice {
+    font-family: var(--font-ui); font-size: 12px; color: var(--text);
+    border: 1px solid var(--accent); background: var(--panel);
+    padding: 10px 14px 12px; margin: 0 0 28px; line-height: 1.55;
+  }
+  .notice .head { color: var(--accent-strong); font-weight: 700; margin-bottom: 4px; }
+  .notice .actions { display: flex; gap: 10px; margin-top: 10px; }
+
+  /* Modal */
+  .scrim { position: absolute; inset: 36px 0 0 0; background: rgba(7, 6, 5, 0.72); display: grid; place-items: center; }
+  .dialog { width: 500px; background: var(--panel); border: 1px solid var(--accent); font-size: 12.5px; }
+  .dialog .bar {
+    background: var(--accent); color: var(--bg); font-weight: 700;
+    padding: 4px 12px; letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px;
+  }
+  .dialog .content { padding: 16px 18px 18px; }
+  .dialog p { margin: 0 0 10px; }
+  .dialog .actions { display: flex; gap: 10px; margin-top: 16px; }
+  .dialog .actions .apart { margin-left: auto; }
+
+  /* Save-state strip */
+  .strip { display: grid; gap: 10px; }
+  .strip .row { border: 1px solid var(--border); }
+  .strip .row .status { height: 26px; border-top: 0; }
+  .strip .cap { font-size: 11px; color: var(--text-dim); margin: 2px 0 -4px; }
+
+  /* Spec sheet */
+  .sheet { border: 1px solid var(--border); background: var(--bg); padding: 22px 26px; display: grid; gap: 26px; }
+  .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .sw { border: 1px solid var(--border); font-size: 11px; }
+  .sw i { display: block; height: 48px; }
+  .sw div { padding: 6px 8px; color: var(--text-dim); }
+  .sw b { display: block; color: var(--text); font-weight: 500; }
+  .ramp { font-family: var(--font-prose); color: var(--prose); }
+  .ramp .row { display: grid; grid-template-columns: 70px 1fr; align-items: baseline; border-bottom: 1px dashed var(--border); padding: 6px 0; }
+  .ramp .row > span:first-child { font-family: var(--font-ui); font-size: 10.5px; color: var(--accent); letter-spacing: 0.08em; }
+  .controls-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+
+  /* ---------- Monochrome / e-paper adaptation ---------- */
+  .app.paper {
+    --bg: #f4f2ee; --panel: #e9e6e0; --text: #111; --text-strong: #000;
+    --text-dim: #555; --border: #9a968f; --accent: #111; --accent-strong: #000;
+    --accent-soft: rgba(0,0,0,0.08); --prose: #111;
+  }
+  .app.paper .titlebar .mark rect.off { fill: #c8c4bd; }
+  .app.paper .ilink { text-decoration-style: solid; }
+  .app.paper .here::before { opacity: 1; }
+</style>
+</head>
+<body data-prose="serif" data-ink="warm">
+<div class="page">
+
+<header>
+  <h1>Mosaic / UI language mocks</h1>
+  <p>Static mocks for the amber terminal direction in DESIGN.md. Nothing here is wired to
+  behavior. The colors come from the existing Ember palette in
+  <code>src/renderer/styles.css</code>; layout, type, and controls are proposals.
+  Notes on the right of each mock explain why each choice exists. Items marked
+  <span style="color:var(--accent)">open</span> are undecided.</p>
+  <div class="switches">
+    <fieldset>
+      <legend>Prose font (open decision)</legend>
+      <label><input type="radio" name="prose" value="serif" checked> Serif</label>
+      <label><input type="radio" name="prose" value="sans"> Sans</label>
+      <label><input type="radio" name="prose" value="mono"> Mono</label>
+    </fieldset>
+    <fieldset>
+      <legend>Prose ink</legend>
+      <label><input type="radio" name="ink" value="warm" checked> Warm white</label>
+      <label><input type="radio" name="ink" value="amber"> Amber</label>
+    </fieldset>
+  </div>
+</header>
+
+<!-- ================================================================ -->
+<section class="mock">
+  <h2>01 — Writing <span>/ the default view</span></h2>
+  <div class="app">
+    <div class="titlebar">
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true">
+        <rect x="0" y="0" width="4" height="4"/><rect x="5" y="0" width="4" height="4" class="off"/><rect x="10" y="0" width="4" height="4"/>
+        <rect x="0" y="5" width="4" height="4" class="off"/><rect x="5" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4" class="off"/>
+        <rect x="0" y="10" width="4" height="4"/><rect x="5" y="10" width="4" height="4" class="off"/><rect x="10" y="10" width="4" height="4"/>
+      </svg>
+      <span class="name">MOSAIC</span>
+      <span class="doc">— The Lighthouse</span>
+      <div class="controls">
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="M3 8h10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></span>
+      </div>
+    </div>
+    <div class="body">
+      <nav class="tree">
+        <div class="project">Lantern Coast</div>
+        <ul>
+          <li class="folder"><div><span class="fold">▾</span>Characters</div>
+            <ul>
+              <li><div>Mira Vell</div></li>
+              <li><div>Old Tomas</div></li>
+            </ul>
+          </li>
+          <li class="folder"><div><span class="fold">▾</span>Places</div>
+            <ul>
+              <li><div>Harbor Town</div></li>
+              <li class="current"><div>The Lighthouse</div></li>
+            </ul>
+          </li>
+          <li class="folder"><div><span class="fold">▸</span>Chapters</div></li>
+          <li><div><span class="fold"></span>Notes</div></li>
+        </ul>
+      </nav>
+      <main class="editor">
+        <div class="column">
+          <h1>The Lighthouse</h1>
+          <p>The tower stands on the last spit of rock past <span class="ilink">Harbor Town</span>,
+          where the road gives up and becomes a path. Nobody has kept the lamp since
+          <span class="ilink hover">Old Tomas</span> walked down the stairs for the final time.</p>
+          <h2>The lamp room</h2>
+          <p><span class="ilink">Mira Vell</span> climbs it the first night out of
+          <em>stubbornness</em>, not courage. The glass is cracked in three places, and the
+          brass is green with salt. <strong>The mechanism still turns.</strong></p>
+          <h3 class="here" data-kind="H3">What she finds there</h3>
+          <p>A logbook, dry somehow, with the last entry written in a hand she almost<span class="caret"></span></p>
+        </div>
+      </main>
+    </div>
+    <footer class="status">
+      <span class="path">Places / The Lighthouse</span>
+      <span class="right">
+        <span>212 words</span>
+        <span class="save">■ Saved</span>
+      </span>
+    </footer>
+  </div>
+  <aside class="notes">
+    <h3>Layout</h3>
+    <p>Three fixed regions: tree, writing column, one status line. No tabs, inspectors,
+    or panels. Each region sits in the same place in every mock, matching DESIGN.md's
+    “favor stillness and predictable placement”.</p>
+    <h3>Two typefaces, two jobs</h3>
+    <p><b>Mono</b> carries the terminal feel in chrome: tree, status, labels, buttons.
+    <b>Prose</b> uses a reading face and warm white, not amber, so long sessions stay
+    comfortable. Try the switches above. <span class="open">Prose family is open.</span></p>
+    <h3>Formatting vocabulary</h3>
+    <p>H1–H3 differ by size and weight, bold by weight, italic by slant. None of it
+    depends on color, which matters for e-paper (see 06).</p>
+    <h3>Implicit links</h3>
+    <p>Dotted underline at rest; solid underline plus brighter text on hover/focus
+    (“Old Tomas”). Text color stays prose-colored, so a page dense with names doesn't
+    turn into an amber wall. <span class="open">How you follow a link is open.</span></p>
+    <h3>Block gutter</h3>
+    <p>A faint <b>H3</b> marker left of the block with the caret tells you the
+    structure without showing markup. A small idea, easy to drop.</p>
+    <h3>Tree</h3>
+    <p>Current document is <b>inverted</b>, not just tinted, so it survives monochrome.
+    The pixel 3×3 mark is the only “graphic”.</p>
+  </aside>
+</section>
+
+<!-- ================================================================ -->
+<section class="mock">
+  <h2>02 — Focus <span>/ tree hidden</span></h2>
+  <div class="app focus short">
+    <div class="titlebar">
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true">
+        <rect x="0" y="0" width="4" height="4"/><rect x="5" y="0" width="4" height="4" class="off"/><rect x="10" y="0" width="4" height="4"/>
+        <rect x="0" y="5" width="4" height="4" class="off"/><rect x="5" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4" class="off"/>
+        <rect x="0" y="10" width="4" height="4"/><rect x="5" y="10" width="4" height="4" class="off"/><rect x="10" y="10" width="4" height="4"/>
+      </svg>
+      <span class="name">MOSAIC</span>
+      <span class="doc">— The Lighthouse</span>
+      <div class="controls">
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="M3 8h10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></span>
+      </div>
+    </div>
+    <div class="body">
+      <main class="editor">
+        <div class="column">
+          <p>A logbook, dry somehow, with the last entry written in a hand she almost
+          recognises. <span class="sel">The ink has run where the page</span> was folded, and the date
+          is missing.</p>
+          <p class="here" data-kind="¶">She reads it twice before she understands that it is addressed to her.<span class="caret"></span></p>
+        </div>
+      </main>
+    </div>
+    <footer class="status">
+      <span class="path">Places / The Lighthouse</span>
+      <span class="right">
+        <span>244 words</span>
+        <span class="save">□ Saving…</span>
+      </span>
+    </footer>
+  </div>
+  <aside class="notes">
+    <h3>Why show this</h3>
+    <p>The writing column doesn't move when the tree hides: it is centered in its
+    own region either way. This is the closest desktop analogue to a dedicated
+    writing device.</p>
+    <h3>Selection</h3>
+    <p>A soft amber wash with a thin outline, so it stays readable over prose and
+    still shows as a boxed region without color.</p>
+    <h3>Caret</h3>
+    <p>A thin, <b>non-blinking</b> amber bar. A block caret is more “terminal” but
+    hides the letter under it in prose. <span class="open">Blink is a preference
+    to decide.</span></p>
+    <p>Toggle gesture (e.g. a shortcut) is <span class="open">open</span>.</p>
+  </aside>
+</section>
+
+<!-- ================================================================ -->
+<section class="mock">
+  <h2>03 — Save status <span>/ the status line's vocabulary</span></h2>
+  <div class="strip">
+    <div class="cap">Normal: last revision reached disk</div>
+    <div class="row"><div class="status"><span class="path">Places / The Lighthouse</span><span class="right"><span>212 words</span><span class="save">■ Saved</span></span></div></div>
+    <div class="cap">Normal: a newer revision is being written; typing continues</div>
+    <div class="row"><div class="status"><span class="path">Places / The Lighthouse</span><span class="right"><span>214 words</span><span class="save">□ Saving…</span></span></div></div>
+    <div class="cap">Failure: stays visible until resolved, with an action</div>
+    <div class="row"><div class="status failed"><span class="path">Places / The Lighthouse</span><span class="right"><span class="save">▲ Couldn't save — disk is full</span><button class="btn">Retry</button></span></div></div>
+  </div>
+  <aside class="notes">
+    <h3>Words plus shape</h3>
+    <p>Each state has a word <b>and</b> a distinct glyph (■ □ ▲). Neither depends on
+    color, so both survive a monochrome screen.</p>
+    <h3>No spinner</h3>
+    <p>“Saving…” is static text. Saves should be brief and frequent; an animation
+    flickering in the corner of your eye on every pause is the kind of motion
+    DESIGN.md asks to avoid.</p>
+    <h3>Failure inverts the bar</h3>
+    <p>The whole line inverts, which is loud in both amber and monochrome. It's the
+    one place the UI raises its voice. Revisions and internals belong in diagnostics,
+    not here.</p>
+  </aside>
+</section>
+
+<!-- ================================================================ -->
+<section class="mock">
+  <h2>04 — Close with unsaved writing <span>/ explicit discard</span></h2>
+  <div class="app short">
+    <div class="titlebar">
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true">
+        <rect x="0" y="0" width="4" height="4"/><rect x="5" y="0" width="4" height="4" class="off"/><rect x="10" y="0" width="4" height="4"/>
+        <rect x="0" y="5" width="4" height="4" class="off"/><rect x="5" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4" class="off"/>
+        <rect x="0" y="10" width="4" height="4"/><rect x="5" y="10" width="4" height="4" class="off"/><rect x="10" y="10" width="4" height="4"/>
+      </svg>
+      <span class="name">MOSAIC</span>
+      <span class="doc">— The Lighthouse</span>
+      <div class="controls">
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="M3 8h10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></span>
+      </div>
+    </div>
+    <div class="body">
+      <nav class="tree">
+        <div class="project">Lantern Coast</div>
+        <ul>
+          <li class="folder"><div><span class="fold">▾</span>Places</div>
+            <ul>
+              <li><div>Harbor Town</div></li>
+              <li class="current unsaved"><div>The Lighthouse</div></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <main class="editor">
+        <div class="column">
+          <p>She reads it twice before she understands that it is addressed to her.</p>
+        </div>
+      </main>
+    </div>
+    <footer class="status failed">
+      <span class="path">Places / The Lighthouse</span>
+      <span class="right"><span class="save">▲ Couldn't save — disk is full</span><button class="btn">Retry</button></span>
+    </footer>
+    <div class="scrim">
+      <div class="dialog" role="dialog">
+        <div class="bar">Close Mosaic</div>
+        <div class="content">
+          <p>“The Lighthouse” has writing that couldn't be saved.</p>
+          <p style="color:var(--text-dim)">The disk is full. Free some space and try again,
+          or keep writing and close later.</p>
+          <div class="actions">
+            <button class="btn primary focus">Keep writing</button>
+            <button class="btn">Try again</button>
+            <button class="btn apart">Discard and close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <h3>When this appears</h3>
+    <p>Only when closing can't settle the save. On a normal close Mosaic finishes the
+    pending save and quits; no “Save changes?” prompt every time.</p>
+    <h3>Safe default</h3>
+    <p><b>Keep writing</b> has focus (visible ring), so pressing Enter by reflex
+    never loses work. <b>Discard</b> is set apart and fully worded rather than
+    relying on red.</p>
+    <h3>Tree marker</h3>
+    <p>The <b>*</b> after the name marks writing not yet on disk — a terminal-era
+    convention that needs no color.</p>
+  </aside>
+</section>
+
+<!-- ================================================================ -->
+<section class="mock">
+  <h2>05 — Changed outside Mosaic <span>/ explicit resolution</span></h2>
+  <div class="app short focus">
+    <div class="titlebar">
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true">
+        <rect x="0" y="0" width="4" height="4"/><rect x="5" y="0" width="4" height="4" class="off"/><rect x="10" y="0" width="4" height="4"/>
+        <rect x="0" y="5" width="4" height="4" class="off"/><rect x="5" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4" class="off"/>
+        <rect x="0" y="10" width="4" height="4"/><rect x="5" y="10" width="4" height="4" class="off"/><rect x="10" y="10" width="4" height="4"/>
+      </svg>
+      <span class="name">MOSAIC</span>
+      <span class="doc">— The Lighthouse</span>
+      <div class="controls">
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="M3 8h10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></span>
+      </div>
+    </div>
+    <div class="body">
+      <main class="editor">
+        <div class="column">
+          <div class="notice">
+            <div class="head">▲ This file changed outside Mosaic</div>
+            Your open writing hasn't been touched. Saving is paused for this document
+            until you choose which version to keep.
+            <div class="actions">
+              <button class="btn primary">Keep mine</button>
+              <button class="btn">Load the other version</button>
+            </div>
+          </div>
+          <p>She reads it twice before she understands that it is addressed to her.<span class="caret"></span></p>
+        </div>
+      </main>
+    </div>
+    <footer class="status">
+      <span class="path">Places / The Lighthouse</span>
+      <span class="right"><span>244 words</span><span class="save">‖ Save paused</span></span>
+    </footer>
+  </div>
+  <aside class="notes">
+    <h3>Inline, not modal</h3>
+    <p>You can keep typing while deciding, and nothing on disk or on screen gets
+    replaced silently. The notice sits in the column, above the prose, so it pushes
+    rather than covers.</p>
+    <h3>Status agrees</h3>
+    <p>The status line says <b>Save paused</b> so it never claims “Saved” while
+    the conflict is unresolved.</p>
+    <p class="open">The actual choices (and whether a comparison view is worth it)
+    are open; this only shows how such a notice looks in the language.</p>
+  </aside>
+</section>
+
+<!-- ================================================================ -->
+<section class="mock">
+  <h2>06 — Monochrome / e-paper <span>/ same markup, different tokens</span></h2>
+  <div class="app paper">
+    <div class="titlebar">
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true">
+        <rect x="0" y="0" width="4" height="4"/><rect x="5" y="0" width="4" height="4" class="off"/><rect x="10" y="0" width="4" height="4"/>
+        <rect x="0" y="5" width="4" height="4" class="off"/><rect x="5" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4" class="off"/>
+        <rect x="0" y="10" width="4" height="4"/><rect x="5" y="10" width="4" height="4" class="off"/><rect x="10" y="10" width="4" height="4"/>
+      </svg>
+      <span class="name">MOSAIC</span>
+      <span class="doc">— The Lighthouse</span>
+      <div class="controls">
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="M3 8h10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10"/></svg></span>
+        <span><svg class="ctl" viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></span>
+      </div>
+    </div>
+    <div class="body">
+      <nav class="tree">
+        <div class="project">Lantern Coast</div>
+        <ul>
+          <li class="folder"><div><span class="fold">▾</span>Characters</div>
+            <ul>
+              <li><div>Mira Vell</div></li>
+              <li><div>Old Tomas</div></li>
+            </ul>
+          </li>
+          <li class="folder"><div><span class="fold">▾</span>Places</div>
+            <ul>
+              <li><div>Harbor Town</div></li>
+              <li class="current"><div>The Lighthouse</div></li>
+            </ul>
+          </li>
+          <li class="folder"><div><span class="fold">▸</span>Chapters</div></li>
+          <li><div><span class="fold"></span>Notes</div></li>
+        </ul>
+      </nav>
+      <main class="editor">
+        <div class="column">
+          <h1>The Lighthouse</h1>
+          <p>The tower stands on the last spit of rock past <span class="ilink">Harbor Town</span>,
+          where the road gives up and becomes a path. Nobody has kept the lamp since
+          <span class="ilink">Old Tomas</span> walked down the stairs for the final time.</p>
+          <h2>The lamp room</h2>
+          <p><span class="ilink">Mira Vell</span> climbs it the first night out of
+          <em>stubbornness</em>, not courage. The glass is cracked in three places, and the
+          brass is green with salt. <strong>The mechanism still turns.</strong></p>
+          <h3 class="here" data-kind="H3">What she finds there</h3>
+          <p>A logbook, dry somehow, with the last entry written in a hand she almost<span class="caret"></span></p>
+        </div>
+      </main>
+    </div>
+    <footer class="status failed">
+      <span class="path">Places / The Lighthouse</span>
+      <span class="right"><span class="save">▲ Couldn't save — disk is full</span><button class="btn">Retry</button></span>
+    </footer>
+  </div>
+  <aside class="notes">
+    <h3>The test, not the target</h3>
+    <p>This isn't an X3 UI. It's mock 01 with only the color tokens swapped, to check
+    that every meaning survives without amber: headings, bold, italic, links
+    (solid underline), current document (inversion), save failure (inverted bar
+    + ▲ + words).</p>
+    <h3>What this buys</h3>
+    <p>If the desktop UI passes this test, a later light theme, high-contrast mode, or
+    an e-reader rendering can reuse the same visual <i>rules</i> even though it won't
+    share code.</p>
+  </aside>
+</section>
+
+<!-- ================================================================ -->
+<section class="mock">
+  <h2>07 — Spec sheet <span>/ tokens and parts</span></h2>
+  <div class="sheet">
+    <div class="swatches">
+      <div class="sw"><i style="background:#0c0b09"></i><div><b>Background</b>#0c0b09</div></div>
+      <div class="sw"><i style="background:#15130f"></i><div><b>Panel</b>#15130f</div></div>
+      <div class="sw"><i style="background:#302b23"></i><div><b>Border</b>#302b23</div></div>
+      <div class="sw"><i style="background:#e6dfd4"></i><div><b>Prose</b>#e6dfd4</div></div>
+      <div class="sw"><i style="background:#dfa13d"></i><div><b>Amber</b>#dfa13d</div></div>
+      <div class="sw"><i style="background:#f2c96f"></i><div><b>Amber strong</b>#f2c96f</div></div>
+    </div>
+    <div class="ramp">
+      <div class="row"><span>H1</span><span style="font-size:1.9em;font-weight:700;color:var(--text-strong)">The Lighthouse</span></div>
+      <div class="row"><span>H2</span><span style="font-size:1.35em;font-weight:700;color:var(--text-strong)">The lamp room</span></div>
+      <div class="row"><span>H3</span><span style="font-size:1.05em;font-weight:700;color:var(--text-strong);letter-spacing:0.02em">What she finds there</span></div>
+      <div class="row"><span>¶</span><span style="font-size:17px">Body prose with <strong style="color:var(--text-strong)">bold</strong>, <em>italic</em>, and an implicit link to <span class="ilink">Mira Vell</span>.</span></div>
+    </div>
+    <div class="controls-row">
+      <button class="btn">Default</button>
+      <button class="btn primary">Primary</button>
+      <button class="btn primary focus">Focused</button>
+      <span style="color:var(--text-dim)">■ Saved</span>
+      <span style="color:var(--text-dim)">□ Saving…</span>
+      <span style="color:var(--text-dim)">▲ Couldn't save</span>
+      <span style="color:var(--text-dim)">‖ Save paused</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <h3>Deliberately small</h3>
+    <p>Six colors (all existing), two type families, one button style, four status
+    glyphs. That's the whole language so far. New parts should be built from these
+    before adding anything.</p>
+    <h3>Not used</h3>
+    <p>No scanlines, glow, flicker, or CRT curvature anywhere near prose. If wanted
+    later, they'd be an opt-in effect on chrome only.</p>
+  </aside>
+</section>
+
+</div>
+<script>
+  for (const input of document.querySelectorAll(".switches input")) {
+    input.addEventListener("change", () => {
+      document.body.dataset[input.name] = input.value;
+    });
+  }
+</script>
+</body>
+</html>
