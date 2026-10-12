@@ -44,6 +44,7 @@ scaffold; product behavior will need its own verification as it is implemented.
 | `src/renderer/Home.tsx` | Shows the pixel logo and name while no project is open |
 | `src/renderer/theme.ts` | Loads, applies, and remembers the amber or green color theme |
 | `src/renderer/theme.css` | Defines each theme's colors as CSS variables |
+| `src/renderer/fonts.css` | Bundles the pixel fonts and names each family as a CSS variable |
 | `src/renderer/styles.css` | Styles the layout and components using only the theme variables |
 | `src/renderer/pixel/bitmap.ts` | Defines the 5×7 bitmap font and converts bitmaps to SVG path data |
 | `src/renderer/pixel/icons.ts` | Defines the logo and window-control icons as bitmaps |

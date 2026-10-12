@@ -19,7 +19,3 @@
   --color-ink: #3dff6e;
   --color-bright: #c6ffd2;
 }
-
-:root {
-  --font-mono: 'JetBrains Mono', ui-monospace, 'Liberation Mono', monospace;
-}
