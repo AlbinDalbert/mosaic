@@ -8,28 +8,16 @@ importers:
 
   .:
     dependencies:
-      '@fontsource-variable/bitcount-grid-single':
+      '@fontsource-variable/atkinson-hyperlegible-mono':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource-variable/bitcount-single':
+      '@fontsource-variable/recursive':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource-variable/pixelify-sans':
+      '@fontsource/ibm-plex-mono':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/jersey-10':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/jersey-15':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/jersey-20':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/jersey-25':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/vt323':
+      '@fontsource/iosevka':
         specifier: ^5.3.0
         version: 5.3.0
       react:
@@ -236,29 +224,17 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fontsource-variable/bitcount-grid-single@5.3.0':
-    resolution: {integrity: sha512-p1FL45RZskZT+YeHqYpnS4VIxhfJejlh7cRGM3ygDRzcdP636P5qMi98h6TE9I1uFNEw2ydvF4I2/e4TGWJPxw==}
+  '@fontsource-variable/atkinson-hyperlegible-mono@5.3.0':
+    resolution: {integrity: sha512-0IbthhO18EEpLe69h+cmrsxCkl4yk80gMk+fAN3+9M5zQvoR1JlkzoJRR6U9/UXLYpVBGEXu+Md2LO8TIp30dw==}
 
-  '@fontsource-variable/bitcount-single@5.3.0':
-    resolution: {integrity: sha512-Dtmh0PBPeJvBVMRr76ADgTQKayn3crDFGx/LL9cz+i3RMFRobenhcZQSNZ4MmL9FAxdv1xJH2T5W6cbIcaUdZA==}
+  '@fontsource-variable/recursive@5.3.0':
+    resolution: {integrity: sha512-4B4/lWCVeZgdbpJdIIU1sOVO/ECjjM673ohuxvyQ6uCK41TPlGzKRNokKY84noUgGYnpwc//MW4k2KrOMY19jQ==}
 
-  '@fontsource-variable/pixelify-sans@5.3.0':
-    resolution: {integrity: sha512-rOF07QCyHg9xb4UZF3lpXOM4UO+zo3y8tXvO7T+vy40GVt/GU8HL+/YWE029CMsbhOwk4plRDY9G8BU5cWs1ig==}
+  '@fontsource/ibm-plex-mono@5.3.0':
+    resolution: {integrity: sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q==}
 
-  '@fontsource/jersey-10@5.3.0':
-    resolution: {integrity: sha512-1dOTUg3JXm/Ls6j4BEPLRF5DHGadCGQy/sIHS7L0SWauB2rEd2W6614Xufxoc+TVXtrt8kVR6IWh3RFkXmy/Cw==}
-
-  '@fontsource/jersey-15@5.3.0':
-    resolution: {integrity: sha512-S7k74/1Gr6g08m7lF1pNW3ey2GbPyfk5RzOx6xBTfTmjQUeAGaO/U3GsEZrY8BVi5dX0OAwHtvho8i3LaPyO0w==}
-
-  '@fontsource/jersey-20@5.3.0':
-    resolution: {integrity: sha512-x2fZogWG1C471cRTay9Fb1GsWGsXToRRNaYWXpUNkM6JOVMFE1dpPX3qWGmq0EF5omIg0OHL80V4+pl3NBqCdQ==}
-
-  '@fontsource/jersey-25@5.3.0':
-    resolution: {integrity: sha512-S0RaezNiHIpQmArXDkQ85rkPBqaP8WQMlVbyp/MHoN9eq5oAUvtU/7AWWg2q4IYG1pbsvCWVvf3KYAJNC/q7cA==}
-
-  '@fontsource/vt323@5.3.0':
-    resolution: {integrity: sha512-3w33Rg/0+R1587HQfz4t7Q7e0GGeCqr3wmzIwqdGInUnrGEwMA5eX39GP4Z9wpTQnwfhVOhYuxuRwRUeIcicbw==}
+  '@fontsource/iosevka@5.3.0':
+    resolution: {integrity: sha512-RcG0v/65e4PTuThR/d7n9jj6PLlex7YUGaLa4ZpL+NnqArWQmD8Z+6gYBTxPMVWxYMRcEw6OF4rdt8XisnC5zA==}
 
   '@hapi/address@5.1.1':
     resolution: {integrity: sha512-A+po2d/dVoY7cYajycYI43ZbYMXukuopIsqCjh5QzsBCipDtdofHntljDlpccMjIfTy6UOkg+5KPriwYch2bXA==}
@@ -1050,21 +1026,13 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
-  '@fontsource-variable/bitcount-grid-single@5.3.0': {}
+  '@fontsource-variable/atkinson-hyperlegible-mono@5.3.0': {}
 
-  '@fontsource-variable/bitcount-single@5.3.0': {}
+  '@fontsource-variable/recursive@5.3.0': {}
 
-  '@fontsource-variable/pixelify-sans@5.3.0': {}
+  '@fontsource/ibm-plex-mono@5.3.0': {}
 
-  '@fontsource/jersey-10@5.3.0': {}
-
-  '@fontsource/jersey-15@5.3.0': {}
-
-  '@fontsource/jersey-20@5.3.0': {}
-
-  '@fontsource/jersey-25@5.3.0': {}
-
-  '@fontsource/vt323@5.3.0': {}
+  '@fontsource/iosevka@5.3.0': {}
 
   '@hapi/address@5.1.1':
     dependencies:

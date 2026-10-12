@@ -4,38 +4,27 @@
   components choose a font only through these variables.
 */
 
-/* Classic terminal lettering. */
-@import '@fontsource/vt323';
-
-/* Jersey: one design drawn on four pixel grids, from coarse (10) to fine (25). */
-@import '@fontsource/jersey-10';
-@import '@fontsource/jersey-15';
-@import '@fontsource/jersey-20';
-@import '@fontsource/jersey-25';
-
-/* Pixelify Sans: variable weight, 400 to 700. */
-@import '@fontsource-variable/pixelify-sans';
-
 /*
-  Bitcount: variable fonts with every axis included. Besides weight (100 to
-  900), they accept font-variation-settings for "slnt" (-8 to 0), "CRSV",
-  "ELSH", and "ELXP".
+  Recursive: the main writing font. The "full" build includes every axis, so
+  the MONO, CASL, and slnt settings below take effect.
 */
-@import '@fontsource-variable/bitcount-single/full.css';
-@import '@fontsource-variable/bitcount-grid-single/full.css';
+@import '@fontsource-variable/recursive/full.css';
+
+/* Alternatives kept for comparison while choosing. */
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import '@fontsource-variable/atkinson-hyperlegible-mono';
+@import '@fontsource/iosevka/latin-400.css';
 
 :root {
-  --font-mono: 'JetBrains Mono', ui-monospace, 'Liberation Mono', monospace;
+  --font-mono: 'Recursive Variable', monospace;
 
-  --font-vt323: 'VT323', monospace;
+  /*
+    Recursive axis values. Components apply them with font-variation-settings
+    so the family name and its settings always stay together.
+  */
+  --font-mono-variations: "MONO" 0.2, "CASL" 0.7, "wght" 400, "slnt" 0;
 
-  --font-jersey-10: 'Jersey 10', sans-serif;
-  --font-jersey-15: 'Jersey 15', sans-serif;
-  --font-jersey-20: 'Jersey 20', sans-serif;
-  --font-jersey-25: 'Jersey 25', sans-serif;
-
-  --font-pixelify-sans: 'Pixelify Sans Variable', sans-serif;
-
-  --font-bitcount-single: 'Bitcount Single Variable', monospace;
-  --font-bitcount-grid-single: 'Bitcount Grid Single Variable', monospace;
+  --font-ibm-plex-mono: 'IBM Plex Mono', monospace;
+  --font-atkinson-hyperlegible-mono: 'Atkinson Hyperlegible Mono Variable', monospace;
+  --font-iosevka: 'Iosevka', monospace;
 }

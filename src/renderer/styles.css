@@ -3,6 +3,7 @@
   background: var(--color-void);
   color: var(--color-ink);
   font-family: var(--font-mono);
+  font-variation-settings: var(--font-mono-variations);
   font-size: 13px;
 }
 
@@ -124,8 +125,15 @@ button {
 
 .home {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 48px;
+}
+
+.home-title {
+  display: flex;
+  align-items: center;
   gap: 26px;
 }
 
@@ -137,4 +145,53 @@ button {
 .home-name p {
   margin-top: 14px;
   color: var(--color-dim);
+}
+
+.home-write {
+  padding: 6px 28px;
+  border: 2px solid var(--color-ink);
+  background: transparent;
+  color: var(--color-ink);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.home-write:hover {
+  background: var(--color-ink);
+  color: var(--color-void);
+}
+
+.home-write:focus-visible {
+  outline: 2px dashed var(--color-bright);
+  outline-offset: 4px;
+}
+
+/* ---------- Editor ---------- */
+
+.editor {
+  display: flex;
+}
+
+/*
+  The textarea fills the whole area so its scrollbar sits at the window edge
+  and clicking beside the text still focuses it. The padding centres a
+  72-character column.
+*/
+.editor textarea {
+  flex: 1;
+  margin: 0;
+  padding: 48px max(48px, calc((100% - 72ch) / 2));
+  border: 0;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--color-ink);
+  caret-color: var(--color-bright);
+  font: 22px/1.8 var(--font-mono);
+  font-variation-settings: var(--font-mono-variations);
+}
+
+.editor textarea::selection {
+  background: var(--color-ink);
+  color: var(--color-void);
 }

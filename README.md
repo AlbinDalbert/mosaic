@@ -39,12 +39,13 @@ scaffold; product behavior will need its own verification as it is implemented.
 | `electron/preload.ts` | Exposes only minimize, maximize/restore, and close commands to the renderer |
 | `src/shared/window.ts` | Defines the window-control interface shared by preload and renderer |
 | `src/renderer/main.tsx` | Applies the saved color theme and mounts the app inside React's development checks |
-| `src/renderer/App.tsx` | Owns the current theme and lays out the title bar above the main area |
+| `src/renderer/App.tsx` | Owns the current theme and screen, and lays out the title bar above the home screen or editor |
 | `src/renderer/TitleBar.tsx` | Renders the pixel title, theme switch, and custom window-control buttons |
-| `src/renderer/Home.tsx` | Shows the pixel logo and name while no project is open |
+| `src/renderer/Home.tsx` | Shows the pixel logo and name, and a Write button that opens the editor |
+| `src/renderer/Editor.tsx` | Provides an unsaved plain-text writing area |
 | `src/renderer/theme.ts` | Loads, applies, and remembers the amber or green color theme |
 | `src/renderer/theme.css` | Defines each theme's colors as CSS variables |
-| `src/renderer/fonts.css` | Bundles the pixel fonts and names each family as a CSS variable |
+| `src/renderer/fonts.css` | Bundles the writing fonts and names each family, and its axis settings, as CSS variables |
 | `src/renderer/styles.css` | Styles the layout and components using only the theme variables |
 | `src/renderer/pixel/bitmap.ts` | Defines the 5×7 bitmap font and converts bitmaps to SVG path data |
 | `src/renderer/pixel/icons.ts` | Defines the logo and window-control icons as bitmaps |
