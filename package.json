@@ -18,7 +18,8 @@
     "build:electron": "node scripts/build-electron.mjs",
     "build:renderer": "vite build",
     "typecheck": "tsc --noEmit",
-    "check": "run-s typecheck build"
+    "test": "node --test \"src/**/*.test.ts\"",
+    "check": "run-s typecheck test build"
   },
   "dependencies": {
     "react": "^19.3.0",

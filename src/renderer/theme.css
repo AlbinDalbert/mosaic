@@ -1,0 +1,25 @@
+/*
+  Phosphor palettes. Components read only these variables, so adding or
+  changing a palette doesn't touch component styles. theme.ts sets the
+  data-theme attribute; amber is also the fallback before it runs.
+*/
+:root,
+:root[data-theme='amber'] {
+  --color-void: #0a0603;
+  --color-shade: #2e1c07;
+  --color-dim: #8a5a12;
+  --color-ink: #ffb000;
+  --color-bright: #ffe2a0;
+}
+
+:root[data-theme='green'] {
+  --color-void: #020702;
+  --color-shade: #0d2b10;
+  --color-dim: #2c7d36;
+  --color-ink: #3dff6e;
+  --color-bright: #c6ffd2;
+}
+
+:root {
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Liberation Mono', monospace;
+}

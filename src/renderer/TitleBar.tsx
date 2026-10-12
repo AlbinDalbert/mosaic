@@ -1,7 +1,32 @@
-export default function TitleBar() {
+import { PixelBitmap, PixelText } from './pixel/Pixels';
+import { CLOSE, LOGO, MAXIMIZE, MINIMIZE } from './pixel/icons';
+import { THEMES, type Theme } from './theme';
+
+interface TitleBarProps {
+  theme: Theme;
+  onThemeChange(theme: Theme): void;
+}
+
+export default function TitleBar({ theme, onThemeChange }: TitleBarProps) {
   return (
     <header className="title-bar">
-      <span className="window-title"><b>Mosaic</b></span>
+      <span className="window-title">
+        <PixelBitmap bitmap={LOGO} scale={2} />
+        <PixelText text="Mosaic" scale={2} />
+      </span>
+      <div className="title-rule dither" />
+      <div className="theme-switch" role="group" aria-label="Color theme">
+        {THEMES.map((option) => (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={option === theme}
+            onClick={() => onThemeChange(option)}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
       <div className="window-controls">
         <button
           type="button"
@@ -9,9 +34,7 @@ export default function TitleBar() {
           title="Minimize window"
           onClick={() => window.mosaicWindow.minimize()}
         >
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M3 8h10" />
-          </svg>
+          <PixelBitmap bitmap={MINIMIZE} scale={2} />
         </button>
         <button
           type="button"
@@ -19,9 +42,7 @@ export default function TitleBar() {
           title="Maximize or restore window"
           onClick={() => window.mosaicWindow.toggleMaximize()}
         >
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <rect x="3" y="3" width="10" height="10" />
-          </svg>
+          <PixelBitmap bitmap={MAXIMIZE} scale={2} />
         </button>
         <button
           type="button"
@@ -30,9 +51,7 @@ export default function TitleBar() {
           title="Close window"
           onClick={() => window.mosaicWindow.close()}
         >
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="m4 4 8 8m0-8-8 8" />
-          </svg>
+          <PixelBitmap bitmap={CLOSE} scale={2} />
         </button>
       </div>
     </header>

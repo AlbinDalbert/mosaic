@@ -26,7 +26,8 @@ pnpm check
 pnpm start
 ```
 
-`check` runs TypeScript checking and builds both processes. `start` opens the
+`check` runs TypeScript checking, the unit tests (`pnpm test`, using Node's
+built-in test runner), and builds both processes. `start` opens the
 built application without a development server. These commands check the
 scaffold; product behavior will need its own verification as it is implemented.
 
@@ -37,9 +38,16 @@ scaffold; product behavior will need its own verification as it is implemented.
 | `electron/main.ts` | Creates the window, loads the renderer, and handles application lifecycle |
 | `electron/preload.ts` | Exposes only minimize, maximize/restore, and close commands to the renderer |
 | `src/shared/window.ts` | Defines the window-control interface shared by preload and renderer |
-| `src/renderer/main.tsx` | Mounts the title bar inside React's development checks |
-| `src/renderer/TitleBar.tsx` | Renders the title and custom window-control buttons |
-| `src/renderer/styles.css` | Sets the dark page colors and draggable title-bar area |
+| `src/renderer/main.tsx` | Applies the saved color theme and mounts the app inside React's development checks |
+| `src/renderer/App.tsx` | Owns the current theme and lays out the title bar above the main area |
+| `src/renderer/TitleBar.tsx` | Renders the pixel title, theme switch, and custom window-control buttons |
+| `src/renderer/Home.tsx` | Shows the pixel logo and name while no project is open |
+| `src/renderer/theme.ts` | Loads, applies, and remembers the amber or green color theme |
+| `src/renderer/theme.css` | Defines each theme's colors as CSS variables |
+| `src/renderer/styles.css` | Styles the layout and components using only the theme variables |
+| `src/renderer/pixel/bitmap.ts` | Defines the 5×7 bitmap font and converts bitmaps to SVG path data |
+| `src/renderer/pixel/icons.ts` | Defines the logo and window-control icons as bitmaps |
+| `src/renderer/pixel/Pixels.tsx` | Draws bitmaps and bitmap text as sharp SVGs in the current text color |
 | `src/renderer/global.d.ts` | Adds the preload interface to TypeScript's Window type |
 | `index.html` | Supplies the renderer's HTML entry point |
 | `scripts/build-electron.mjs` | Compiles main and preload into CommonJS for Electron |

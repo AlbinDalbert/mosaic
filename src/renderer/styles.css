@@ -1,46 +1,97 @@
 :root {
-  /* Amanite's default Ember palette. */
-  --app-background: #0c0b09;
-  --app-panel: #15130f;
-  --app-text: #e6dfd4;
-  --app-text-strong: #fbf7ef;
-  --app-border: #302b23;
-  --app-accent: #dfa13d;
-  --app-accent-strong: #f2c96f;
-  --app-accent-soft: rgba(223, 161, 61, 0.12);
-  --app-danger: #b33a2e;
-
   color-scheme: dark;
-  background: var(--app-background);
-  color: var(--app-text);
-  font-family: system-ui, sans-serif;
+  background: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
 }
 
-body {
+html,
+body,
+#root {
+  height: 100%;
   margin: 0;
 }
+
+button {
+  font: inherit;
+}
+
+/* Block display avoids the gap an inline SVG leaves below the baseline. */
+.pixels {
+  display: block;
+  flex: none;
+}
+
+/* A checkerboard of 2px squares in the dim color. */
+.dither {
+  background: var(--color-dim);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='2' height='2'/%3E%3Crect x='2' y='2' width='2' height='2'/%3E%3C/svg%3E")
+    0 0 / 4px 4px;
+}
+
+.app {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ---------- Title bar ---------- */
 
 .title-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 36px;
-  background: var(--app-panel);
-  border-bottom: 1px solid var(--app-border);
+  gap: 12px;
+  height: 40px;
+  padding-left: 14px;
+  border-bottom: 2px solid var(--color-ink);
   app-region: drag;
   user-select: none;
 }
 
 .window-title {
-  margin-left: 12px;
-  font-size: 12px;
-  color: var(--app-accent);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title-rule {
+  flex: 1;
+  height: 10px;
+}
+
+.theme-switch,
+.window-controls {
+  display: flex;
+  app-region: no-drag;
+}
+
+.theme-switch {
+  border: 2px solid var(--color-ink);
+}
+
+.theme-switch button {
+  padding: 2px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.theme-switch button + button {
+  border-left: 2px solid var(--color-ink);
+}
+
+.theme-switch button[aria-pressed='true'] {
+  background: var(--color-ink);
+  color: var(--color-void);
 }
 
 .window-controls {
-  display: flex;
-  height: 100%;
-  app-region: no-drag;
+  align-self: stretch;
 }
 
 .window-controls button {
@@ -50,28 +101,40 @@ body {
   padding: 0;
   border: 0;
   background: transparent;
-  color: inherit;
+  color: var(--color-ink);
 }
 
 .window-controls button:hover {
-  background: var(--app-accent-soft);
-  color: var(--app-accent-strong);
-}
-
-.window-controls button:focus-visible {
-  outline: 2px solid var(--app-accent);
-  outline-offset: -3px;
+  background: var(--color-shade);
+  color: var(--color-bright);
 }
 
 .window-controls .close-window:hover {
-  background: var(--app-danger);
-  color: var(--app-text-strong);
+  background: var(--color-ink);
+  color: var(--color-void);
 }
 
-.window-controls svg {
-  width: 14px;
-  height: 14px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.25;
+.theme-switch button:focus-visible,
+.window-controls button:focus-visible {
+  outline: 2px dashed var(--color-bright);
+  outline-offset: -5px;
+}
+
+/* ---------- Home ---------- */
+
+.home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+}
+
+.home-name h1,
+.home-name p {
+  margin: 0;
+}
+
+.home-name p {
+  margin-top: 14px;
+  color: var(--color-dim);
 }

@@ -8,7 +8,7 @@ function createWindow(): void {
     title: 'Mosaic',
     frame: false,
     show: false,
-    backgroundColor: '#0c0b09',
+    backgroundColor: '#0a0603',
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
