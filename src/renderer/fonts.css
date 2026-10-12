@@ -1,30 +1,22 @@
 /*
   Fonts are bundled from Fontsource packages so Mosaic never fetches them
-  from the network. Each family is exposed as a --font-* variable;
-  components choose a font only through these variables.
+  from the network. Each family is exposed as a --font-* variable. fonts.ts
+  chooses which one --font-mono points to.
 */
 
-/*
-  Recursive: the main writing font. The "full" build includes every axis, so
-  the MONO, CASL, and slnt settings below take effect.
-*/
-@import '@fontsource-variable/recursive/full.css';
+/* JetBrains Mono: variable weight. */
+@import '@fontsource-variable/jetbrains-mono';
 
-/* Alternatives kept for comparison while choosing. */
-@import '@fontsource/ibm-plex-mono/latin-400.css';
-@import '@fontsource-variable/atkinson-hyperlegible-mono';
-@import '@fontsource/iosevka/latin-400.css';
+/* Typewriter face. */
+@import '@fontsource/courier-prime/latin-400.css';
+
+/* Exo 2: variable weight sans-serif. */
+@import '@fontsource-variable/exo-2';
 
 :root {
-  --font-mono: 'Recursive Variable', monospace;
+  --font-jetbrains-mono: 'JetBrains Mono Variable', monospace;
+  --font-courier-prime: 'Courier Prime', monospace;
+  --font-exo-2: 'Exo 2 Variable', sans-serif;
 
-  /*
-    Recursive axis values. Components apply them with font-variation-settings
-    so the family name and its settings always stay together.
-  */
-  --font-mono-variations: "MONO" 0.2, "CASL" 0.7, "wght" 400, "slnt" 0;
-
-  --font-ibm-plex-mono: 'IBM Plex Mono', monospace;
-  --font-atkinson-hyperlegible-mono: 'Atkinson Hyperlegible Mono Variable', monospace;
-  --font-iosevka: 'Iosevka', monospace;
+  --font-mono: var(--font-jetbrains-mono);
 }

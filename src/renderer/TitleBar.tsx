@@ -1,13 +1,16 @@
 import { PixelBitmap, PixelText } from './pixel/Pixels';
 import { CLOSE, LOGO, MAXIMIZE, MINIMIZE } from './pixel/icons';
+import { FONTS, type FontId } from './fonts';
 import { THEMES, type Theme } from './theme';
 
 interface TitleBarProps {
   theme: Theme;
   onThemeChange(theme: Theme): void;
+  font: FontId;
+  onFontChange(font: FontId): void;
 }
 
-export default function TitleBar({ theme, onThemeChange }: TitleBarProps) {
+export default function TitleBar({ theme, onThemeChange, font, onFontChange }: TitleBarProps) {
   return (
     <header className="title-bar">
       <span className="window-title">
@@ -27,6 +30,18 @@ export default function TitleBar({ theme, onThemeChange }: TitleBarProps) {
           </button>
         ))}
       </div>
+      <select
+        className="font-select"
+        aria-label="Writing font"
+        value={font}
+        onChange={(event) => onFontChange(event.target.value as FontId)}
+      >
+        {FONTS.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.label}
+          </option>
+        ))}
+      </select>
       <div className="window-controls">
         <button
           type="button"

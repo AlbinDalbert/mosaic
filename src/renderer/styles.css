@@ -3,7 +3,8 @@
   background: var(--color-void);
   color: var(--color-ink);
   font-family: var(--font-mono);
-  font-variation-settings: var(--font-mono-variations);
+  font-weight: var(--font-weight);
+  letter-spacing: var(--font-tracking);
   font-size: 13px;
 }
 
@@ -16,6 +17,7 @@ body,
 
 button {
   font: inherit;
+  letter-spacing: inherit;
 }
 
 /* Block display avoids the gap an inline SVG leaves below the baseline. */
@@ -55,6 +57,19 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.font-select {
+  height: 26px;
+  padding: 0 8px;
+  border: 2px solid var(--color-ink);
+  border-radius: 0;
+  background: var(--color-void);
+  color: var(--color-ink);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  app-region: no-drag;
 }
 
 .title-rule {
@@ -187,8 +202,9 @@ button {
   background: transparent;
   color: var(--color-ink);
   caret-color: var(--color-bright);
-  font: 22px/1.8 var(--font-mono);
-  font-variation-settings: var(--font-mono-variations);
+  font: 28px/1.6 var(--font-mono);
+  font-weight: var(--font-weight);
+  letter-spacing: var(--font-tracking);
 }
 
 .editor textarea::selection {
