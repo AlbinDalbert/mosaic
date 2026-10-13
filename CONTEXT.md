@@ -5,14 +5,34 @@ capabilities. Its guiding ideas remain *Implicit Linking, Just Write* and
 *Your Data, Always Transformable*. Writing lives in native HTML documents and
 structured folders that remain understandable and useful outside the app.
 
-The previous attempts made the importance of uninterrupted writing concrete.
-Saving, state changes, and background work repeatedly interfered with the
-editor. Mosaic's priorities come from that experience and from what the user
-actually used, especially implicit links and the file tree.
-
 This document records the product's philosophy and how to make tradeoffs.
 PLAN.md contains implementation direction and technical decisions. Read those
 decisions through the priorities here.
+
+## Where Mosaic comes from
+
+Mosaic is the next attempt at ideas first built as two applications. Fractal
+was the backend package: projects as structured folders of documents, with
+ordering, links, and a format meant to stay useful outside any app. Amanite
+was the writing application built on Fractal, with a Lexical editor and a
+broader set of writing capabilities. Neo's focused writing workflow later
+showed how little an ordinary edit needs to involve.
+
+The split is the cautionary tale. Fractal and Amanite each held their own idea
+of a document, one on disk and one in the editor, and kept them in step through
+saves, reloads, and polling. That coordination is what kept interfering with
+writing: buffered typing, caret jumps, and pauses that grew with document size.
+Fixing individual paths never made the whole reliable, and the accumulated
+complexity exhausted the project's momentum.
+
+The lesson is that writing has one owner. Saving records what was written and
+never reaches back into the editor. Background work stays out of the writer's
+way. A change that quietly introduces a second authority over the writing is
+not a simplification, whatever it is called.
+
+The previous attempts also showed what mattered in practice: the user relied
+on implicit links and the file tree. Mosaic's priorities come from that
+experience.
 
 ## The priority hierarchy
 

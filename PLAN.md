@@ -1,15 +1,17 @@
 # Mosaic implementation plan
 
-Created: 2026-09-26.
-Status: product direction. Implementation reset to a bare scaffold on 2026-10-01.
-No document behavior or performance acceptance is claimed.
+Created: 2026-09-26. Design direction merged in: 2026-10-13.
+Status: living technical direction. No document behavior or performance
+acceptance is claimed.
 
-## 1. Read this first
+[CONTEXT.md](CONTEXT.md) holds Mosaic's ethos and priority hierarchy. It changes
+rarely and governs every tradeoff here. This plan records how Mosaic is built:
+settled decisions, architecture rules, the direction for upcoming work, open
+questions, and progress. It is expected to change as work proceeds. Keeping a
+capability in scope here does not give it equal priority or authorize it to
+disrupt a higher priority capability.
 
-Read [CONTEXT.md](CONTEXT.md) for Mosaic's product ethos and priority hierarchy.
-It governs tradeoffs between the capabilities described here. Keeping a
-capability in scope does not give it equal priority or authorize it to disrupt
-a higher priority capability.
+## 1. Working from this plan
 
 Mosaic is a new desktop writing application that combines the useful parts of
 Amanite and Fractal. It starts in a new repository so their existing boundaries
@@ -17,18 +19,11 @@ do not dictate its architecture. Reuse substantial code where it fits; do not
 copy either application's architecture wholesale.
 
 The user is keeping Fractal's structural philosophy and Amanite's broader
-writing capabilities. They are reconsidering the implementation and redesigning
-the interface after experiencing Neo's focused writing workflow.
-
-This is not an abandonment of structured projects, a Neo clone, or a cosmetic
-refresh of Amanite. Neo is a reference for product scope, writing interactions,
-and how little an ordinary editing operation needs to involve.
-
-This document defines Mosaic's direction. Implementation proceeds in small
-changes that the user can understand and review. The earlier prototype has been
-archived and removed; it is not the starting point for feature development.
-Proof-of-concept features, mocks, placeholder services, and speculative
-abstractions are not part of this approach.
+writing capabilities, and is redesigning the interface after experiencing Neo's
+focused writing workflow. This is not an abandonment of structured projects, a
+Neo clone, or a cosmetic refresh of Amanite. Neo is a reference for product
+scope, writing interactions, and how little an ordinary editing operation needs
+to involve.
 
 The sibling repositories are sources of code and evidence, not additional
 implementation requirements. Amanite's
@@ -37,7 +32,8 @@ Mosaic's roadmap. Do not complete that migration as a prerequisite for Mosaic.
 
 ### Instructions for implementation agents
 
-1. Read this document and the repository AGENTS.md before implementing behavior.
+1. Read CONTEXT.md, this document, and the repository AGENTS.md before
+   implementing behavior.
 2. Distinguish settled decisions, proposed designs, and unresolved questions.
 3. Implement the requested behavior in a small, complete change and verify it.
    This plan does not authorize implementing features ahead of the user's work.
@@ -50,6 +46,26 @@ Mosaic's roadmap. Do not complete that migration as a prerequisite for Mosaic.
    responsive editing, safe persistence, or a good writing experience.
 8. Update the progress record with implementation, tests, limitations, and the
    next bounded task. Keep this plan self-contained for subsequent agents.
+
+### Delivery approach
+
+Implementation proceeds in small changes that the user can understand and
+review. Proof-of-concept features, mocks, placeholder services, and speculative
+abstractions are not part of this approach. The earlier prototype has been
+archived and removed; it is not the starting point for feature development.
+
+For each agreed behavior:
+
+1. State what the user should be able to do and how to verify it.
+2. Review the relevant product decisions and explain where the state belongs.
+3. Implement the behavior without temporary mocks or speculative interfaces.
+4. Verify the behavior and explain the changed code together.
+5. Record the result and any concrete unresolved issue.
+
+The intended work includes document format and editing, persistence and
+recovery, structured projects and links, the writing workflow, headless
+commands, and release packaging. These are areas of work, not permission to
+implement several systems at once.
 
 ## 2. Settled decisions
 
@@ -69,22 +85,25 @@ These decisions come from the user and are not open technology-selection tasks.
 | Title semantics | Changing a document title is renaming the document; keep title-derived filenames |
 | Compatibility | Treat Mosaic as a new major version; old Fractal projects may fail to load |
 | Format freedom | Backward compatibility must not block a better design; do not build a migration layer by default |
-| Storage direction | Native HTML documents and structured folders remain central |
+| Storage direction | Structured folders of documents that remain useful outside the app; HTML is the current format (see section 8) |
 | Concurrent editing | No automatic merging of independently edited HTML sections is required |
 | Code reuse | Copy useful implementation and tests selectively from Amanite and Fractal |
 | UI direction | Redesign around writing tasks; existing panels, tabs, and controls are not requirements |
+| Vocabulary | Very slim support with high reliability; a limited document vocabulary can be permanent |
 
 One-editor ownership and dropping section merging are separate simplifications.
 The first removes duplicate live-editor synchronization. The second removes the
 requirement to merge independent disk edits automatically.
 
-## 3. The problem Mosaic must solve
+## 3. What went wrong before
+
+CONTEXT.md tells the story of Fractal and Amanite and its lesson. This section
+records the technical detail behind it.
 
 Amanite has recurring reports of buffered typing, caret jumps, and pauses that
-grow with document size. Fixes to individual paths have not established a
-consistently responsive document lifecycle.
-
-The inspected implementation contains several sources of complexity:
+grow with document size. Fixes to individual paths did not establish a
+consistently responsive document lifecycle. The inspected implementation
+contains several sources of complexity:
 
 - Lexical state coexists with source buffers, snapshots, and migration bridges.
 - Fractal can mutate saved documents that Amanite separately owns in memory.
@@ -100,16 +119,16 @@ The old three-second polling interval matches one reported rhythm, but that
 alone does not establish causation. Preserve representative failing fixtures
 and measure Mosaic rather than assuming Electron fixes the problem.
 
-Rust itself has not been established as the cause. The old split adds duplicate
-representations, cross-language interfaces, and ownership coordination. Electron
-still has process boundaries and serialization costs. Keep large recurring work
-off the typing path regardless of language.
+Neither Lexical, HTML, nor Rust has been established as the cause. The old
+split added duplicate representations, cross-language interfaces, and ownership
+coordination. Electron still has process boundaries and serialization costs.
+Keep large recurring work off the typing path regardless of language.
 
-## 4. Product scope: keep, remove, and reconsider
+## 4. Scope
 
 ### Keep as intended capabilities
 
-- Native HTML documents that remain inspectable and useful outside the app.
+- Documents that remain inspectable and useful outside the app.
 - Projects with a folder tree, explicit child order, and writing across a
   collection of documents.
 - Title-driven document renaming and managed moves.
@@ -121,8 +140,11 @@ off the typing path regardless of language.
 - Safe structural operations that preserve links and ordered collections.
 - Secondary headless operation with the same document rules.
 
-Keeping a capability does not require keeping its current UI or implementation.
-The initial changes need not implement all capabilities simultaneously.
+Keeping a capability does not require keeping its old UI or implementation, and
+the initial changes need not implement all capabilities simultaneously.
+Organizational conveniences must earn their complexity. A basic file tree is
+Kernal, but elaborate folder views, manual ordering, panels, and workspace
+arrangements are not prerequisites for establishing the editing experience.
 
 ### Remove as requirements
 
@@ -135,7 +157,7 @@ The initial changes need not implement all capabilities simultaneously.
 - Independently editable source and rich-text representations of one document.
 - Saving title, body, style, and metadata as separately acknowledged operations.
 - Old-format compatibility and automatic conversion of existing projects.
-- Preserving the current Amanite workspace arrangement.
+- Preserving the old Amanite workspace arrangement.
 
 ### Review when designing interactions
 
@@ -148,9 +170,6 @@ Test proposed interactions with actual prose and structured projects before
 making them permanent. In particular, chapter-specific Enter behavior may not
 fit every kind of document Mosaic supports.
 
-Do not change the color palette merely to distinguish Mosaic from Neo. The
-similarity was an observation, not a problem the user asked to solve.
-
 ## 5. Architecture rules
 
 ### One authoritative live document
@@ -162,17 +181,37 @@ its selection just because a React key changed.
 React displays subscribed state and issues commands. Component mounting and
 effects must not determine persistence correctness or document ownership.
 
-Saving captures a document revision and records it. It does not reinstall
-content, rebuild the editor, or publish source back into the editing model.
+A separately loaded or validated saved document must not become a competing
+authority that the editor continually reconciles with. Serialized content is
+persistence output. It may be retained for explicit baseline or recovery
+purposes, but it is a capture, not a second editable model.
 
-Serialized HTML is persistence output. It may be retained for explicit baseline
-or recovery purposes, but must not become a second live editing authority.
+### Saving data flow
+
+```text
+Live document -> captured revision -> safe file persistence
+                                          |
+                               success or failure acknowledgement
+                                          |
+                               persistence status in the session
+```
+
+Saving captures a consistent document revision and persists that capture. The
+acknowledgement identifies what reached storage and changes persistence
+bookkeeping only. It does not reinstall content, recreate the editor, or reset
+selection and history. Acknowledging revision N leaves any newer revision
+pending. An unsaved revision is normal; its status must be understandable.
+
+Typing must not synchronously export the full document, perform filesystem work,
+or wait for a project scan or link index. Choosing an autosave timer alone does
+not establish that expensive work stays off the typing path; measure it.
 
 ### Initial editor candidate
 
 Lexical is the initial candidate, not a user-mandated permanent choice. Review
-the editor integration when implementing actual editing behavior.
-Reuse useful nodes and commands without copying old ownership machinery.
+the editor integration against actual writing and save behavior when
+implementing editing. Reuse useful nodes and commands without copying old
+ownership machinery.
 
 Lexical supports headless state operations through `@lexical/headless`. HTML
 import/export may need DOM facilities or an appropriate conversion environment.
@@ -196,7 +235,7 @@ Desktop UI                         Secondary headless interface
                            |
                   capture a saved revision
                            |
-                 native HTML persistence
+                     file persistence
                            |
                          files
 ```
@@ -243,11 +282,14 @@ prerequisite for the desktop product.
 
 ## 6. Persistence and external changes
 
+Keeping the editor small does not remove safe writes, recovery, or overwrite
+protection. These are part of trustworthy writing.
+
 ### Ordinary saving
 
-One save captures a consistent document and revision, validates/encodes native
-HTML, and persists it through one document-save operation. Preserve untouched
-format content according to the new format contract.
+One save captures a consistent document and revision, validates and encodes it,
+and persists it through one document-save operation. Preserve untouched format
+content according to the format contract.
 
 Acknowledgements contain the committed revision, baseline information, and any
 relevant path changes. They cannot replace live editor content. Saving revision
@@ -289,8 +331,9 @@ mechanism, not a second document owner or a guarantee against races.
 
 ### Recovery and close
 
-Recovery records must identify what revision actually reached storage. Keep
-recovery data until a save or explicit discard makes it safe to remove.
+Failures remain visible, and writing remains recoverable. Recovery records must
+identify what revision actually reached storage. Keep recovery data until a
+save or explicit discard makes it safe to remove.
 
 Close settles composition, captures a finite final revision, and waits for the
 required persistence or an explicit discard decision. Failure leaves the
@@ -322,25 +365,123 @@ Do not claim that unification makes multi-file failure handling disappear.
 Undo after a rename or link rewrite must not restore stale paths. Specify and
 verify history behavior rather than assuming editor-instance survival proves it.
 
-## 8. Format contract
+Implicit links arise from unambiguous document-name mentions and remain derived:
+recognizing a link must not insert markup into the saved prose or change the
+writer's text. Implement implicit linking as its own complete behavior once
+document naming and lookup exist.
+
+## 8. Document format
 
 Write a short new-version format specification before expanding feature work.
-Decide the manifest/version marker, native filename convention, document title
+Decide the manifest/version marker, filename convention, document title
 representation, content/style/metadata ownership, folder ordering, and links.
-
-Keep files understandable with ordinary HTML tools. Define which markup Mosaic
-supports and how unsupported content is handled without silent destruction.
-Define how unrelated files in project folders are treated.
+Define which content Mosaic supports and how unsupported content is handled
+without silent destruction. Define how unrelated files in project folders are
+treated.
 
 Old Fractal projects may be rejected clearly. No compatibility layer, import
 pipeline, or format migration is required unless the user later requests one.
 Do not use that freedom to silently reinterpret or overwrite an old project.
 
-Native HTML remains the intended durable document representation. Do not add a
-second canonical JSON document format as an implementation shortcut. Internal
-captures, indexes, and recovery metadata are not separate canonical formats.
+Do not add a second canonical JSON document format as an implementation
+shortcut. Internal captures, indexes, and recovery metadata are not separate
+canonical formats. Avoid a custom canonical format unless a concrete
+requirement justifies its tooling cost.
 
-## 9. Reuse policy
+### HTML or Markdown
+
+HTML remains the current storage direction. The user has found it valuable for
+parsing and rendering, but awkward for directly changing source text. That is a
+concrete reason to review the decision before writing the format contract.
+
+Keep three responsibilities distinct:
+
+- The durable format describes the saved writing.
+- The live editing model owns ongoing changes.
+- Rendering presents that writing on a particular device.
+
+A browser interface can render HTML generated from Markdown. An HTML file can be
+edited through a structured model. Choosing either format does not require a
+save-and-reload feedback loop.
+
+| Candidate | Main benefit | Cost to evaluate |
+| --- | --- | --- |
+| Defined HTML subset | Existing parsing and rendering capabilities; explicit structure | Source editing involves markup and escaping; conversion must preserve supported content |
+| Defined Markdown dialect | Readable source that ordinary text tools can edit | Rich editing needs conversion; original syntax and whitespace may change when regenerated |
+
+For HTML, define the supported vocabulary instead of making arbitrary HTML and
+CSS necessary to understand a document. For Markdown, decide whether preserving
+meaning is sufficient or whether original source spelling and layout must also
+survive rich editing. Neither choice establishes responsive editing or safe
+saving by itself, and the terminal aesthetic does not settle the format or
+require source editing.
+
+## 9. Compatibility with an X3 and phone
+
+The intended X3 project is a writing device with a close connection to the phone,
+potentially using it for backend work, while retaining independent operation.
+The current intention is to use Git for moving changes between devices. This
+plan does not design a synchronization service or automatic merging.
+
+The most useful shared agreement is what a document means. Shared code is a
+possible consequence, not a prerequisite.
+
+| Area | Compatibility requirement |
+| --- | --- |
+| Content | A small, documented vocabulary that another implementation can understand |
+| Presentation | Formatting meaning survives different fonts, colors, and screen layouts |
+| Identity | Document identity remains distinguishable from its mutable title and path |
+| Linking | Document-name recognition follows consistent rules and remains derived |
+| Persistence | Each editing owner saves revisions without creating a second live authority |
+
+Keep document meaning independent of React components, Electron APIs, CSS, and
+browser layout. Environment-independent rules can become small shared modules
+when actual behavior needs them. Do not create a generic backend package or
+public protocol solely for anticipated reuse. Reusing desktop UI code on the X3
+is not a requirement.
+
+An interface may display less formatting than it preserves. For example, an X3
+view might not visually distinguish bold, but editing nearby text must not
+silently erase it. Replacing a rich document with a plain-text projection would
+violate that requirement.
+
+If independent operation includes writing with the phone absent, the device needs
+local editing, persistence, and recovery for its supported content. Ownership
+handoff and competing offline revisions need an explicit policy when that
+workflow is implemented. Git does not define those editing semantics.
+
+## 10. Visual language
+
+The interface draws on an Aperture Science-like phosphor terminal, restrained
+pixel graphics, and a dedicated writing device. It currently has switchable
+amber (default) and green phosphor themes defined as CSS variables in
+`src/renderer/theme.css`, a hand-drawn 5×7 bitmap font for titles, and bitmap
+icons. Static design explorations live in `design/`; they are references, not
+specifications.
+
+Let compact controls, lettering, and simple shapes carry the retro character.
+Use pixel typography with restraint in labels and status. Choose the prose font
+for sustained reading and editing; its family remains open.
+
+The editor should have a stable writing area, clear heading levels, recognizable
+bold and italic, and minimal persistent controls. Add navigation around actual
+writing tasks rather than inheriting Amanite's panel arrangement.
+
+Give implicit links a restrained treatment that remains recognizable through a
+non-color cue, such as an underline. Keep keyboard focus visible. Present save
+status in ordinary language, such as "Saving", "Saved", or "Couldn't save", with
+an available action when something fails. Internal revisions belong in
+diagnostics.
+
+Favor stillness and predictable placement. Decorative scanlines, flicker, glow,
+or motion must not compromise prose legibility or distract from typing. A
+monochrome adaptation should retain meaning through typography, spacing, and
+shapes. No essential action or status should depend on color.
+
+Do not change the color palette merely to distinguish Mosaic from Neo. The
+similarity was an observation, not a problem the user asked to solve.
+
+## 11. Reuse policy
 
 | Source | Good candidates | Do not inherit automatically |
 | --- | --- | --- |
@@ -355,31 +496,7 @@ and preserve required notices when copying code from any source.
 Keep sibling repositories unchanged during Mosaic implementation unless the
 user specifically asks for changes there.
 
-## 10. Delivery approach
-
-The repository starts with an empty desktop application. The previous sequence
-of proof-of-concept milestones has been retired. The next behavior is chosen
-with the user, and each change should be understandable before work expands.
-
-For each agreed behavior:
-
-1. State what the user should be able to do and how to verify it.
-2. Review the relevant product decisions and explain where the state belongs.
-3. Implement the behavior without temporary mocks or speculative interfaces.
-4. Verify the behavior and explain the changed code together.
-5. Record the result and any concrete unresolved issue.
-
-The intended work still includes document format and editing, persistence and
-recovery, structured projects and links, the writing workflow, headless
-commands, and release packaging. These are areas of work, not permission to
-implement several systems at once.
-
-Performance and correctness evidence belongs to the actual behavior as it is
-built. Ordinary saves must preserve newer edits; structural changes must
-preserve unsaved content and links; supported editing must keep selection and
-history stable. An empty scaffold claims none of these capabilities.
-
-## 11. Required evidence
+## 12. Required evidence
 
 Use the actual Electron desktop app. Browser-only tests cannot establish desktop
 composition, lifecycle, IPC, or filesystem behavior. Choose an Electron-compatible
@@ -388,7 +505,8 @@ automation setup; Amanite's Tauri WebDriver scripts do not apply to Mosaic.
 Include short prose, long prose, huge paragraphs, many small paragraphs, lists,
 tables, dense links, many-page projects, and multiple open documents. Reuse the
 100k, 1m, and 5m visible-character fixtures where available. Label unsupported
-cases honestly rather than quietly excluding failing sizes.
+cases honestly rather than quietly excluding failing sizes. Slim support should
+mean fewer well-verified behaviors, not weaker persistence rules.
 
 Proposed starting performance targets, to validate against the supported matrix:
 
@@ -409,9 +527,11 @@ lag. Run at least a 60-second typing sequence through repeated save cycles.
 Correctness scenarios must include:
 
 - Save revision N while N+1 is being typed.
+- Successful saves preserve selection, composition, and undo history.
 - Type and immediately close, switch document, or rename.
 - Undo after save and after structural changes.
-- Slow/failing storage and external modifications.
+- Slow/failing storage, with failures visible and writing recoverable.
+- External modifications that must not silently replace or overwrite local work.
 - Own-write observations without false conflict UI.
 - Duplicate-open requests without duplicate editors.
 - Restart after process termination with exact recovery content.
@@ -422,21 +542,33 @@ Use deterministic core tests for ordering and failures, and desktop tests for
 caret/selection, composition, and responsiveness. Do not expand the test suite
 with tests that merely repeat implementation details.
 
-## 12. Open decisions
+## 13. Next direction
+
+The proposed first bounded behavior is one real document that can be opened,
+edited with basic formatting, saved, and reopened. Settle the small format
+contract and editor integration as part of that work. Establish persistence
+correctness before introducing broader project operations. Implicit linking
+follows once document naming and lookup exist.
+
+## 14. Open decisions
 
 Resolve these when implementing the relevant behavior; retain the settled stack.
 
-- Exact new-version format and supported markup.
+- Retain a defined HTML subset or deliberately revise the format to Markdown,
+  and the exact supported markup.
 - Editor choice and integration when actual editing behavior is implemented.
+- Prose and utility typography within the phosphor direction.
 - Title-commit interaction and structural undo behavior.
 - External-change resolution details and baseline granularity.
 - Autosave/recovery deadlines and durability guarantees.
 - Encoding strategy for large documents if synchronous export exceeds budgets.
 - Initial headless command scope and owner-routing mechanism.
-- Which tabs/groups and Neo-inspired writing interactions belong in the product.
+- The first navigation interactions and organizational conveniences, including
+  which tabs/groups and Neo-inspired writing interactions belong in the product.
+- The X3's independent writing scope and phone responsibilities.
 - Initial supported platforms and measured document-size expectations.
 
-## 13. Progress record
+## 15. Progress record
 
 | Date | Stage | Work and evidence | Remaining work |
 | --- | --- | --- | --- |
@@ -444,9 +576,11 @@ Resolve these when implementing the relevant behavior; retain the settled stack.
 | 2026-10-01 | Scaffold reset | Retained Electron, TypeScript, React, and build/run tooling. Removed document code, editor dependencies, UI styling, preload/IPC, the provisional format contract, and demo fixture. `npm run check` and dependency-tree validation pass. Electron launches with both the built HTML and Vite renderer were checked on Linux in a virtual display: one window, empty mounted React root, context isolation and sandboxing enabled, no renderer Node access. | Choose the next small behavior with the user |
 | 2026-10-01 | Window appearance and package manager | Added a dark native theme, dark initial window/renderer backgrounds, and a custom draggable title bar with minimize, maximize/restore, and close commands through a narrow preload bridge. Removed the native frame and default application menu. Migrated to pnpm 10.29.3; all 162 locked package versions match the previous npm lockfile. Frozen installation and `pnpm check` pass. Built and development Electron window controls, dark color scheme, drag-region CSS, and renderer isolation were checked on Linux/Wayland. | Add actual application behavior in a small reviewed change; other desktop platforms remain untested |
 | 2026-10-01 | Default amber palette | Applied Amanite's default Ember colors from `src/styles/tokens.css` at commit `480c4a47fea0d49fefcb1147d970eb4f44e2cf6d` to the existing shell and matching Electron startup background. `pnpm check` passes; background, text, title bar, border, amber accent, and hover colors were verified in Electron on Linux/Wayland. | Continue with the next user-selected change |
-| 2026-10-12 | Phosphor visual language | Replaced the Ember palette with switchable amber (default) and green phosphor themes defined as CSS variables; the choice is stored in renderer localStorage and applied before first render. Added a hand-drawn 5×7 bitmap font and bitmap icons rendered as crisp SVG, a pixel title bar with theme switch and pixel window controls, and a home screen with the pixel logo and name. Design exploration lives in untracked `design/` mocks. `pnpm check` passes, including new bitmap tests run with Node's built-in test runner. In built Electron on Linux/Wayland: default amber, switching to green, and green surviving a restart were checked through the DevTools protocol. | Bitmap font is uppercase-only; the UI monospace font is not bundled; pixel edges are only guaranteed at whole-number display scales. File sidebar arrives with project opening |
+| 2026-10-12 | Phosphor visual language | Replaced the Ember palette with switchable amber (default) and green phosphor themes defined as CSS variables; the choice is stored in renderer localStorage and applied before first render. Added a hand-drawn 5×7 bitmap font and bitmap icons rendered as crisp SVG, a pixel title bar with theme switch and pixel window controls, and a home screen with the pixel logo and name. Design exploration mocks are committed in `design/`. `pnpm check` passes, including new bitmap tests run with Node's built-in test runner. In built Electron on Linux/Wayland: default amber, switching to green, and green surviving a restart were checked through the DevTools protocol. | Bitmap font is uppercase-only; pixel edges are only guaranteed at whole-number display scales. File sidebar arrives with project opening |
+| 2026-10-12 | Fonts and writing area | Bundled JetBrains Mono, Courier Prime, and Exo 2 through Fontsource so no fonts are fetched from the network. A title-bar selector switches the interface and writing font, with per-font weight and letter spacing, remembered in localStorage. The home screen's Write button opens an unsaved plain-text writing area with a centred 72-character column. | The font selector is exploratory and the prose font remains open; the writing area saves nothing; the green theme's window background is amber until the renderer loads |
+| 2026-10-13 | Planning documents | Merged DESIGN.md into this plan and reorganized it as the living technical document; CONTEXT.md remains the stable ethos and gained a short account of where Mosaic comes from. | Decide the document format |
 
-## 14. Reference material
+## 16. Reference material
 
 - `../amanite/docs/document-runtime-replacement-plan.md`: failure history,
   document-ownership rules, fixtures, and prior verification gaps.
