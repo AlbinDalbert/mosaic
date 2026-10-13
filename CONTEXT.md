@@ -2,8 +2,10 @@
 
 Mosaic brings together Fractal's structural philosophy and Amanite's writing
 capabilities. Its guiding ideas remain *Implicit Linking, Just Write* and
-*Your Data, Always Transformable*. Writing lives in native HTML documents and
-structured folders that remain understandable and useful outside the app.
+*Your Data, Always Transformable*. Writing lives in plain Markdown documents
+and structured folders that remain understandable and useful outside the app.
+Mosaic's value lies in how it renders, links, and organizes those files, not in
+a format of its own.
 
 This document records the product's philosophy and how to make tradeoffs.
 PLAN.md contains implementation direction and technical decisions. Read those
@@ -69,8 +71,8 @@ ordering equally important.
 
 Start with a slim vocabulary: paragraphs, H1 through H3 headings, bold, and
 italic. The writer can edit these structures and see their formatting while
-working. This does not settle the input gestures or require Markdown as the
-document format.
+working. Storing Markdown does not mean the writer types Markdown syntax; the
+input gestures remain open.
 
 ### Features
 
@@ -89,8 +91,8 @@ that distinction when deciding where effort and interface space belong.
 2. Extension support.
 3. Generic HTML editing.
 
-These capabilities must fit within the priorities above them. Native HTML
-storage does not itself require arbitrary HTML editing in the writing interface.
+These capabilities must fit within the priorities above them, and must not
+make the Markdown files harder to read or edit outside the app.
 
 ## How to use this model
 

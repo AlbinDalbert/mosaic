@@ -2,7 +2,7 @@
   "name": "mosaic",
   "version": "0.1.0",
   "private": true,
-  "description": "A focused desktop writing desk for native HTML documents.",
+  "description": "A focused desktop writing desk for Markdown documents.",
   "type": "module",
   "main": "dist-electron/main.cjs",
   "packageManager": "pnpm@10.29.3",

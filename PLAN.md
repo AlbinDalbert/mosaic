@@ -85,8 +85,8 @@ These decisions come from the user and are not open technology-selection tasks.
 | Title semantics | Changing a document title is renaming the document; keep title-derived filenames |
 | Compatibility | Treat Mosaic as a new major version; old Fractal projects may fail to load |
 | Format freedom | Backward compatibility must not block a better design; do not build a migration layer by default |
-| Storage direction | Structured folders of documents that remain useful outside the app; HTML is the current format (see section 8) |
-| Concurrent editing | No automatic merging of independently edited HTML sections is required |
+| Storage format | Markdown documents in structured folders that remain useful outside the app; HTML is an export target (see section 8) |
+| Concurrent editing | No automatic merging of independently edited document sections is required |
 | Code reuse | Copy useful implementation and tests selectively from Amanite and Fractal |
 | UI direction | Redesign around writing tasks; existing panels, tabs, and controls are not requirements |
 | Vocabulary | Very slim support with high reliability; a limited document vocabulary can be permanent |
@@ -213,15 +213,16 @@ the editor integration against actual writing and save behavior when
 implementing editing. Reuse useful nodes and commands without copying old
 ownership machinery.
 
-Lexical supports headless state operations through `@lexical/headless`. HTML
-import/export may need DOM facilities or an appropriate conversion environment.
-Verify conversion with the actual nodes and format; do not assume headless state
-support makes every browser-dependent plugin usable in Node.
+Lexical supports headless state operations through `@lexical/headless`. Verify
+Markdown conversion with the actual nodes, including preservation of
+unsupported content; do not assume headless state support makes every
+browser-dependent plugin usable in Node.
 
-Do not build a source-text editor with hidden HTML markup as an assumed Neo
-implementation. Neo edits browser DOM and serializes HTML; its active-paragraph
-drop-cap behavior is presentation. A source-backed editor would be a separate
-proposal with substantial editing and selection-mapping requirements.
+Do not build a source-text editor with hidden markup as an assumed
+implementation. Markdown storage does not imply one, and Neo does not use one:
+it edits browser DOM and serializes HTML; its active-paragraph drop-cap
+behavior is presentation. A source-backed editor would be a separate proposal
+with substantial editing and selection-mapping requirements.
 
 ### Command and persistence separation
 
@@ -388,11 +389,17 @@ shortcut. Internal captures, indexes, and recovery metadata are not separate
 canonical formats. Avoid a custom canonical format unless a concrete
 requirement justifies its tooling cost.
 
-### HTML or Markdown
+### Markdown storage, HTML export
 
-HTML remains the current storage direction. The user has found it valuable for
-parsing and rendering, but awkward for directly changing source text. That is a
-concrete reason to review the decision before writing the format contract.
+Decided 2026-10-13: documents are stored as Markdown. HTML had been the
+direction, but it is awkward to edit by hand and hard to read in Git diffs,
+which matters for moving work between devices with Git. Markdown is readable
+in any text editor, widely supported by other writing tools, and an existing
+Markdown folder is already close to a Mosaic project. Mosaic's value lies in
+its rendering, implicit linking, folder structure, and metadata.
+
+HTML becomes an export target. For the supported vocabulary, conversion to
+HTML is direct; export may also turn implicit links into real links.
 
 Keep three responsibilities distinct:
 
@@ -400,21 +407,27 @@ Keep three responsibilities distinct:
 - The live editing model owns ongoing changes.
 - Rendering presents that writing on a particular device.
 
-A browser interface can render HTML generated from Markdown. An HTML file can be
-edited through a structured model. Choosing either format does not require a
-save-and-reload feedback loop.
+Storing Markdown does not make Mosaic a source-text editor or require a
+save-and-reload feedback loop. The editor works on a structured model; Markdown
+is what a save writes and what opening a document reads.
 
-| Candidate | Main benefit | Cost to evaluate |
-| --- | --- | --- |
-| Defined HTML subset | Existing parsing and rendering capabilities; explicit structure | Source editing involves markup and escaping; conversion must preserve supported content |
-| Defined Markdown dialect | Readable source that ordinary text tools can edit | Rich editing needs conversion; original syntax and whitespace may change when regenerated |
+Markdown means CommonMark. Reading accepts every CommonMark spelling, such as
+both `*x*` and `_x_` for italic.
 
-For HTML, define the supported vocabulary instead of making arbitrary HTML and
-CSS necessary to understand a document. For Markdown, decide whether preserving
-meaning is sufficient or whether original source spelling and layout must also
-survive rich editing. Neither choice establishes responsive editing or safe
-saving by itself, and the terminal aesthetic does not settle the format or
-require source editing.
+Saving preserves source at block level. A block is a top-level CommonMark
+unit: a paragraph, heading, list, table, code block, or similar. Each block
+keeps the exact source it was read from. A save writes untouched blocks back
+byte for byte and regenerates only the blocks the writer edited. This keeps Git
+diffs limited to actual edits and preserves constructs outside Mosaic's
+vocabulary: they are never edited, so they are never rewritten.
+
+The format specification must settle:
+
+- Which Markdown constructs Mosaic edits. The vocabulary starts as paragraphs,
+  H1 through H3, bold, and italic.
+- How an edited block is regenerated: a single house style, the file's
+  detected style, or the original spelling of each surviving span; and whether
+  edited paragraphs are unwrapped or re-wrapped.
 
 ## 9. Compatibility with an X3 and phone
 
@@ -554,8 +567,8 @@ follows once document naming and lookup exist.
 
 Resolve these when implementing the relevant behavior; retain the settled stack.
 
-- Retain a defined HTML subset or deliberately revise the format to Markdown,
-  and the exact supported markup.
+- The Markdown format specification: edited constructs and how an edited
+  block's spelling and wrapping are regenerated.
 - Editor choice and integration when actual editing behavior is implemented.
 - Prose and utility typography within the phosphor direction.
 - Title-commit interaction and structural undo behavior.
@@ -577,8 +590,8 @@ Resolve these when implementing the relevant behavior; retain the settled stack.
 | 2026-10-01 | Window appearance and package manager | Added a dark native theme, dark initial window/renderer backgrounds, and a custom draggable title bar with minimize, maximize/restore, and close commands through a narrow preload bridge. Removed the native frame and default application menu. Migrated to pnpm 10.29.3; all 162 locked package versions match the previous npm lockfile. Frozen installation and `pnpm check` pass. Built and development Electron window controls, dark color scheme, drag-region CSS, and renderer isolation were checked on Linux/Wayland. | Add actual application behavior in a small reviewed change; other desktop platforms remain untested |
 | 2026-10-01 | Default amber palette | Applied Amanite's default Ember colors from `src/styles/tokens.css` at commit `480c4a47fea0d49fefcb1147d970eb4f44e2cf6d` to the existing shell and matching Electron startup background. `pnpm check` passes; background, text, title bar, border, amber accent, and hover colors were verified in Electron on Linux/Wayland. | Continue with the next user-selected change |
 | 2026-10-12 | Phosphor visual language | Replaced the Ember palette with switchable amber (default) and green phosphor themes defined as CSS variables; the choice is stored in renderer localStorage and applied before first render. Added a hand-drawn 5×7 bitmap font and bitmap icons rendered as crisp SVG, a pixel title bar with theme switch and pixel window controls, and a home screen with the pixel logo and name. Design exploration mocks are committed in `design/`. `pnpm check` passes, including new bitmap tests run with Node's built-in test runner. In built Electron on Linux/Wayland: default amber, switching to green, and green surviving a restart were checked through the DevTools protocol. | Bitmap font is uppercase-only; pixel edges are only guaranteed at whole-number display scales. File sidebar arrives with project opening |
-| 2026-10-12 | Fonts and writing area | Bundled JetBrains Mono, Courier Prime, and Exo 2 through Fontsource so no fonts are fetched from the network. A title-bar selector switches the interface and writing font, with per-font weight and letter spacing, remembered in localStorage. The home screen's Write button opens an unsaved plain-text writing area with a centred 72-character column. | The font selector is exploratory and the prose font remains open; the writing area saves nothing; the green theme's window background is amber until the renderer loads |
-| 2026-10-13 | Planning documents | Merged DESIGN.md into this plan and reorganized it as the living technical document; CONTEXT.md remains the stable ethos and gained a short account of where Mosaic comes from. | Decide the document format |
+| 2026-10-12 | Fonts and writing area | Bundled JetBrains Mono, Courier Prime, and Exo 2 through Fontsource so no fonts are fetched from the network. A title-bar selector switches the interface and writing font, with per-font weight and letter spacing, remembered in localStorage. The home screen's Write button opens an unsaved plain-text writing area with a centred 72-character column. | The theme and font switchers stay in the title bar until a settings page replaces them, so both can be tried while the choice is unsettled; the writing area saves nothing; the green theme's window background is amber until the renderer loads |
+| 2026-10-13 | Planning documents | Merged DESIGN.md into this plan and reorganized it as the living technical document; CONTEXT.md remains the stable ethos and gained a short account of where Mosaic comes from. Chose CommonMark Markdown as the stored format, with HTML as an export target and block-level source preservation on save, and updated CONTEXT.md to match. | Write the Markdown format specification |
 
 ## 16. Reference material
 
