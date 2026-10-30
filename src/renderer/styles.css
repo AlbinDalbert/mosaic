@@ -181,6 +181,118 @@ button {
   outline-offset: 4px;
 }
 
+.home-actions {
+  display: flex;
+  gap: 16px;
+}
+
+/* ---------- Workspace ---------- */
+
+.workspace {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 0;
+}
+
+.sidebar {
+  overflow-y: auto;
+  border-right: 2px solid var(--color-ink);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--color-ink);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sidebar-header span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-header button {
+  padding: 2px 10px;
+  border: 2px solid var(--color-ink);
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.sidebar-header button:hover {
+  background: var(--color-ink);
+  color: var(--color-void);
+}
+
+.file-tree {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar > .file-tree {
+  padding: 8px 0;
+}
+
+.file-tree .file-tree {
+  padding-left: 14px;
+}
+
+.file-tree summary,
+.file-tree button {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 3px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.file-tree summary {
+  color: var(--color-dim);
+  list-style: none;
+}
+
+.file-tree summary::before {
+  content: '+ ';
+}
+
+.file-tree details[open] > summary::before {
+  content: '- ';
+}
+
+.file-tree button {
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  text-align: left;
+}
+
+.file-tree summary:hover,
+.file-tree button:hover {
+  background: var(--color-shade);
+  color: var(--color-bright);
+}
+
+.file-tree button[aria-current='page'] {
+  background: var(--color-ink);
+  color: var(--color-void);
+}
+
+.file-tree summary:focus-visible,
+.file-tree button:focus-visible,
+.sidebar-header button:focus-visible {
+  outline: 2px dashed var(--color-bright);
+  outline-offset: -2px;
+}
+
 /* ---------- Editor ---------- */
 
 .editor {

@@ -18,7 +18,7 @@
     "build:electron": "node scripts/build-electron.mjs",
     "build:renderer": "vite build",
     "typecheck": "tsc --noEmit",
-    "test": "node --test \"src/**/*.test.ts\"",
+    "test": "node --test \"src/**/*.test.ts\" \"electron/**/*.test.ts\"",
     "check": "run-s typecheck test build"
   },
   "dependencies": {

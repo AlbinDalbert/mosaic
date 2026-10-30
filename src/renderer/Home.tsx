@@ -2,7 +2,12 @@ import { PixelBitmap, PixelText } from './pixel/Pixels';
 import { LOGO } from './pixel/icons';
 
 // Shown while no project is open.
-export default function Home({ onWrite }: { onWrite(): void }) {
+interface HomeProps {
+  onWrite(): void;
+  onOpenFolder(): void;
+}
+
+export default function Home({ onWrite, onOpenFolder }: HomeProps) {
   return (
     <main className="home">
       <div className="home-title">
@@ -16,9 +21,14 @@ export default function Home({ onWrite }: { onWrite(): void }) {
           </p>
         </div>
       </div>
-      <button type="button" className="home-write" onClick={onWrite}>
-        Write
-      </button>
+      <div className="home-actions">
+        <button type="button" className="home-write" onClick={onWrite}>
+          Write
+        </button>
+        <button type="button" className="home-write" onClick={onOpenFolder}>
+          Open folder
+        </button>
+      </div>
     </main>
   );
 }
