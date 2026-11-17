@@ -1,3 +1,5 @@
+_Arcived because obsidian setup does basicaly everything and more already_
+
 # Mosaic
 
 Mosaic is a desktop writing application under construction, using Electron,
