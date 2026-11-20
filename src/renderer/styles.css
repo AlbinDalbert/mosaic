@@ -195,7 +195,9 @@ button {
 }
 
 .sidebar {
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   border-right: 2px solid var(--color-ink);
 }
 
@@ -236,7 +238,29 @@ button {
 }
 
 .sidebar > .file-tree {
+  flex: 1;
+  overflow-y: auto;
   padding: 8px 0;
+}
+
+.save-status {
+  padding: 8px 12px;
+  border-top: 2px solid var(--color-ink);
+  color: var(--color-dim);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.save-status[data-state='failed'] {
+  background: var(--color-ink);
+  color: var(--color-void);
+}
+
+.save-status p {
+  margin: 6px 0 0;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .file-tree .file-tree {

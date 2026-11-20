@@ -9,9 +9,14 @@ export interface Project {
   entries: ProjectEntry[];
 }
 
+export type SaveResult = { ok: true } | { ok: false; reason: string };
+
 export interface MosaicProjectApi {
   // Asks for a folder and opens it; null if the dialog was cancelled.
   open(): Promise<Project | null>;
   // Reads a document from the opened folder.
   readDocument(path: string): Promise<string>;
+  // Saves a document read from the opened folder; rejects with the reason
+  // if it couldn't be saved.
+  saveDocument(path: string, text: string): Promise<void>;
 }

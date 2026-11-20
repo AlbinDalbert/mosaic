@@ -38,16 +38,18 @@ scaffold; product behavior will need its own verification as it is implemented.
 | File | Responsibility |
 | --- | --- |
 | `electron/main.ts` | Creates the window, loads the renderer, and handles application lifecycle |
-| `electron/preload.ts` | Exposes the window controls and the open-folder and read-document commands to the renderer |
-| `electron/project.ts` | Lists a folder's subfolders and Markdown documents, and confines document reads to the open folder |
+| `electron/preload.ts` | Exposes the window controls, the close handshake, and the open-folder, read-document, and save-document commands to the renderer |
+| `electron/project.ts` | Lists a folder's subfolders and Markdown documents, confines document access to the open folder, and writes documents safely |
 | `src/shared/window.ts` | Defines the window-control interface shared by preload and renderer |
 | `src/shared/project.ts` | Defines the opened folder's tree and the project interface shared by preload and renderer |
 | `src/renderer/main.tsx` | Applies the saved color theme and mounts the app inside React's development checks |
 | `src/renderer/App.tsx` | Owns the theme, font, open folder, and shown document, and lays out the title bar above the home screen, the scratch editor, or the folder workspace |
 | `src/renderer/FileTree.tsx` | Draws the open folder's tree with collapsible folders and selectable documents |
+| `src/renderer/DocumentEditor.tsx` | Shows a document from the open folder and attaches its autosave |
+| `src/renderer/autosave.ts` | Saves a document a moment after typing stops, one save at a time, reporting only status changes |
 | `src/renderer/TitleBar.tsx` | Renders the pixel title, theme switch, and custom window-control buttons |
 | `src/renderer/Home.tsx` | Shows the pixel logo and name, and Write and Open folder buttons |
-| `src/renderer/Editor.tsx` | Provides an unsaved plain-text writing area, read-only when showing a document from disk |
+| `src/renderer/Editor.tsx` | Provides the plain-text writing area; unsaved on its own, saved when used by DocumentEditor |
 | `src/renderer/theme.ts` | Loads, applies, and remembers the amber or green color theme |
 | `src/renderer/theme.css` | Defines each theme's colors as CSS variables |
 | `src/renderer/fonts.css` | Bundles the writing fonts and names each family as a CSS variable |
@@ -67,5 +69,13 @@ The renderer has no Node access. Context isolation and sandboxing are enabled.
 Window controls and folder commands cross a small preload bridge into the main
 process, which acts on the requesting window. The main process shows the
 folder dialog and remembers the folder each window opened; the renderer can
-only ask it to read Markdown documents inside that folder, not general IPC or
-filesystem access.
+only ask it to read and save Markdown documents inside that folder, not general
+IPC or filesystem access.
+
+Saving stays off the typing path. A keystroke only counts a revision and
+restarts a one-second timer in `autosave.ts`. When typing pauses, the text is
+read once and sent to the main process, which writes it to a temporary file
+and renames it over the document, but only if the file still matches what
+Mosaic last read or wrote. The reply changes only the save status; nothing is
+put back into the editor. Switching documents, opening another folder, and
+closing the window save first, and offer to discard the edits if that fails.
